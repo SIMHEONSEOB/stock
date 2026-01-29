@@ -20,18 +20,26 @@ class StockRecommendation extends HTMLElement {
 
         const style = document.createElement('style');
         style.textContent = `
+            h2 {
+                color: var(--text-color);
+            }
+            p {
+                color: var(--text-color);
+            }
             .stock-card {
-                border-bottom: 1px solid #ddd;
+                border-bottom: 1px solid var(--border-color);
                 padding-bottom: 20px;
+                transition: border-bottom 0.2s;
             }
             .chart-placeholder {
                 width: 150px;
                 height: 80px;
-                background-color: #eee;
+                background-color: var(--bg-color);
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                color: #999;
+                color: var(--subtle-text-color);
+                transition: background-color 0.2s, color 0.2s;
             }
         `;
 
@@ -78,4 +86,20 @@ stockList.forEach(stock => {
     stockElement.setAttribute('ticker', stock.ticker);
     stockElement.setAttribute('reason', stock.reason);
     stockListElement.appendChild(stockElement);
+});
+
+// --- Theme Toggle Script ---
+const themeToggle = document.getElementById('theme-toggle');
+const htmlElement = document.documentElement;
+
+// 1. On page load, check for saved theme in localStorage
+const savedTheme = localStorage.getItem('theme') || 'light';
+htmlElement.setAttribute('data-theme', savedTheme);
+
+// 2. Add event listener to the toggle button
+themeToggle.addEventListener('click', () => {
+    const currentTheme = htmlElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    htmlElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme); // 3. Save the new theme preference
 });
