@@ -64,3 +64,64 @@ stock-recommendation h2 {
     display: flex;
     justify-content: space-between;
 }
+
+#contact-form {
+    background-color: var(--card-bg-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    margin: 20px;
+    padding: 20px;
+    transition: background-color 0.2s;
+}
+
+#contact-form h2 {
+    color: var(--text-color);
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+#contact-form form {
+    display: flex;
+    flex-direction: column;
+}
+
+#contact-form label {
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+#contact-form input[type="text"],
+#contact-form input[type="email"],
+#contact-form textarea {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-color); /* Use general background for input */
+    color: var(--text-color);
+    transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+#contact-form input[type="text"]:focus,
+#contact-form input[type="email"]:focus,
+#contact-form textarea:focus {
+    border-color: #007bff; /* Highlight focus */
+    outline: none;
+}
+
+#contact-form button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+#contact-form button[type="submit"]:hover {
+    background-color: #0056b3;
+}
