@@ -1,0 +1,42 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    background-color: #f0f2f5;
+}
+
+header {
+    background-color: #fff;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+main {
+    padding: 20px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    font-size: 12px;
+    color: #666;
+}
+
+stock-recommendation {
+    display: block;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+stock-recommendation h2 {
+    margin-top: 0;
+}
+
+.stock-info {
+    display: flex;
+    justify-content: space-between;
+}
