@@ -273,15 +273,15 @@ async function fetchAndRecommendStocks() {
 
             if (prices.length >= 30) { // Enough data for all indicators
                 const sma20 = calculateSMA(prices, 20);
-                latestSMA20 = sma20.length > 0 ? sma20[sma20.length - 1].toFixed(2) : 'N/A';
+                latestSMA20 = (sma20.length > 0 && isFinite(sma20[sma20.length - 1])) ? sma20[sma20.length - 1].toFixed(2) : 'N/A';
 
                 const rsi14 = calculateRSI(prices, 14);
-                latestRSI14 = rsi14.length > 0 ? rsi14[rsi14.length - 1].toFixed(2) : 'N/A';
+                latestRSI14 = (rsi14.length > 0 && isFinite(rsi14[rsi14.length - 1])) ? rsi14[rsi14.length - 1].toFixed(2) : 'N/A';
 
                 const macd = calculateMACD(prices, 12, 26, 9);
-                latestMACDLine = macd.macdLine.length > 0 ? macd.macdLine[macd.macdLine.length - 1].toFixed(2) : 'N/A';
-                latestSignalLine = macd.signalLine.length > 0 ? macd.signalLine[macd.macdLine.length - 1].toFixed(2) : 'N/A';
-                latestHistogram = macd.histogram.length > 0 ? macd.histogram[macd.histogram.length - 1].toFixed(2) : 'N/A';
+                latestMACDLine = (macd.macdLine.length > 0 && isFinite(macd.macdLine[macd.macdLine.length - 1])) ? macd.macdLine[macd.macdLine.length - 1].toFixed(2) : 'N/A';
+                latestSignalLine = (macd.signalLine.length > 0 && isFinite(macd.signalLine[macd.signalLine.length - 1])) ? macd.signalLine[macd.signalLine.length - 1].toFixed(2) : 'N/A';
+                latestHistogram = (macd.histogram.length > 0 && isFinite(macd.histogram[macd.histogram.length - 1])) ? macd.histogram[macd.histogram.length - 1].toFixed(2) : 'N/A';
 
                 // Original Simple Recommendation Logic
                 recommendation = '관망';
