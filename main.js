@@ -152,10 +152,12 @@ class StockRecommendation extends HTMLElement {
         const recommendation = this.getAttribute('recommendation');
         const newsString = this.getAttribute('news');
         let news = [];
-        try {
-            news = JSON.parse(newsString || '[]');
-        } catch (e) {
-            console.error("Error parsing news data:", e);
+        if (newsString && newsString !== 'undefined') { // Explicitly check for 'undefined' string and actual value
+            try {
+                news = JSON.parse(newsString);
+            } catch (e) {
+                console.error("[DEBUG] Error parsing news data:", e, "newsString was:", newsString);
+            }
         }
 
         // Clear existing content
