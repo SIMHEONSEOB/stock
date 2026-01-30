@@ -1,4 +1,3 @@
-
 // Helper function to introduce a delay
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -281,7 +280,7 @@ async function fetchAndRecommendStocks() {
 
                 const macd = calculateMACD(prices, 12, 26, 9);
                 latestMACDLine = macd.macdLine.length > 0 ? macd.macdLine[macd.macdLine.length - 1].toFixed(2) : 'N/A';
-                latestSignalLine = macd.signalLine.length > 0 ? macd.signalLine[macd.signalLine.length - 1].toFixed(2) : 'N/A';
+                latestSignalLine = macd.signalLine.length > 0 ? macd.signalLine[macd.macdLine.length - 1].toFixed(2) : 'N/A';
                 latestHistogram = macd.histogram.length > 0 ? macd.histogram[macd.histogram.length - 1].toFixed(2) : 'N/A';
 
                 // Original Simple Recommendation Logic
@@ -383,8 +382,6 @@ async function fetchAndRecommendStocks() {
         stockListElement.innerHTML = '<p>표시할 주식 추천이 없습니다.</p>';
         return;
     }
-
-    console.log("[DEBUG] Starting recommendedStocks.forEach loop.");
 
     console.log("[DEBUG] Starting recommendedStocks.forEach loop.");
     recommendedStocks.forEach(stock => {
