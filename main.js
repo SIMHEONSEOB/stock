@@ -123,7 +123,7 @@ class StockRecommendation extends HTMLElement {
 
     // Attributes to observe
     static get observedAttributes() {
-        return ['name', 'ticker', 'reason', 'latest-price', 'sma20', 'rsi14', 'macd-line', 'signal-line', 'histogram', 'recommendation'];
+        return ['name', 'ticker', 'reason', 'latest-price', 'sma20', 'rsi14', 'macd-line', 'signal-line', 'histogram', 'recommendation', 'news'];
     }
 
     connectedCallback() {
@@ -150,12 +150,36 @@ class StockRecommendation extends HTMLElement {
         const signalLine = this.getAttribute('signal-line');
         const histogram = this.getAttribute('histogram');
         const recommendation = this.getAttribute('recommendation');
+        const newsString = this.getAttribute('news');
+        let news = [];
+        try {
+            news = JSON.parse(newsString || '[]');
+        } catch (e) {
+            console.error("Error parsing news data:", e);
+        }
 
         // Clear existing content
         this.shadowRoot.innerHTML = '';
 
         const wrapper = document.createElement('div');
         wrapper.setAttribute('class', 'stock-card');
+
+        let newsHtml = '';
+        if (news.length > 0) {
+            newsHtml = `
+                <h3>최신 뉴스</h3>
+                <ul class="news-list">
+                    ${news.map(article => `
+                        <li>
+                            <a href="${article.url}" target="_blank">${article.title}</a>
+                            <span class="news-source">(${article.source} - ${new Date(article.time_published).toLocaleDateString()})</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+        } else {
+            newsHtml = '<p>관련 뉴스를 찾을 수 없습니다.</p>';
+        }
 
         wrapper.innerHTML = `
             <h2>${name} (${ticker})</h2>
@@ -169,6 +193,9 @@ class StockRecommendation extends HTMLElement {
                 <p><strong>추천:</strong> ${recommendation}</p>
                 <p><strong>사유:</strong> ${reason}</p>
                 <div class="chart-placeholder">간단한 차트</div>
+            </div>
+            <div class="stock-news">
+                ${newsHtml}
             </div>
         `;
         console.log("[DEBUG] StockRecommendation wrapper.innerHTML:", wrapper.innerHTML);
@@ -198,6 +225,24 @@ class StockRecommendation extends HTMLElement {
                 transition: background-color 0.2s, color 0.2s;
                 margin-top: 10px;
             }
+            .news-list {
+                list-style: none;
+                padding: 0;
+            }
+            .news-list li {
+                margin-bottom: 5px;
+            }
+            .news-list a {
+                color: var(--link-color);
+                text-decoration: none;
+            }
+            .news-list a:hover {
+                text-decoration: underline;
+            }
+            .news-source {
+                font-size: 0.8em;
+                color: var(--subtle-text-color);
+            }
         `;
 
         this.shadowRoot.appendChild(style);
@@ -217,6 +262,33 @@ const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query';
 // --- Stock Recommendation Logic ---
 const targetTickers = ['AAPL']; // Reduced to 1 to accommodate Alpha Vantage free tier daily limit
 const stockListElement = document.getElementById('stock-list');
+
+async function fetchNewsData(ticker) {
+    try {
+        const url = `${ALPHA_VANTAGE_BASE_URL}?function=NEWS_SENTIMENT&tickers=${ticker}&limit=5&sort=latest&apikey=${ALPHA_VANTAGE_API_KEY}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log(`[DEBUG] News API response for ${ticker} (always):`, data);
+
+        if (data['Error Message']) {
+            console.error(`Error fetching news for ${ticker}: ${data['Error Message']}`);
+            return [];
+        }
+        if (!data.feed || data.feed.length === 0) {
+            console.warn(`No news feed found for ${ticker}.`);
+            return [];
+        }
+        return data.feed.slice(0, 5).map(item => ({
+            title: item.title,
+            url: item.url,
+            source: item.source,
+            time_published: item.time_published
+        }));
+    } catch (error) {
+        console.error(`Failed to fetch news for ${ticker}:`, error);
+        return [];
+    }
+}
 
 async function fetchAndRecommendStocks() {
     stockListElement.innerHTML = '<p>주식 데이터를 불러오는 중입니다...</p>'; // Loading indicator
@@ -285,6 +357,10 @@ async function fetchAndRecommendStocks() {
 
             // Always try to get latest price even if data is short
             const latestPrice = prices[prices.length - 1];
+
+            // Fetch news data
+            const newsArticles = await fetchNewsData(ticker);
+            console.log(`[DEBUG] News articles for ${ticker}:`, newsArticles);
 
             let latestSMA20 = 'N/A';
             let latestRSI14 = 'N/A';
@@ -368,7 +444,8 @@ async function fetchAndRecommendStocks() {
                 signalLine: latestSignalLine,
                 histogram: latestHistogram,
                 recommendation: recommendation,
-                reason: reason
+                reason: reason,
+                news: newsArticles // Add news articles here
             });
             console.log(`[DEBUG] recommendedStocks after push for ${ticker}:`, recommendedStocks.length, recommendedStocks);
 
@@ -423,6 +500,7 @@ async function fetchAndRecommendStocks() {
         stockElement.setAttribute('histogram', stock.histogram !== 'N/A' ? stock.histogram : 'N/A');
         
         stockElement.setAttribute('recommendation', stock.recommendation);
+        stockElement.setAttribute('news', JSON.stringify(stock.news));
         stockListElement.appendChild(stockElement);
         console.log("[DEBUG] Stock element appended:", stockElement); // Confirm append
     });
