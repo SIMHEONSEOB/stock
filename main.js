@@ -1,3 +1,4 @@
+
 // Helper function to introduce a delay
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -186,7 +187,7 @@ customElements.define('stock-recommendation', StockRecommendation);
 // --- Alpha Vantage API Configuration ---
 const ALPHA_VANTAGE_API_KEY = '1D4KMGHILXDEKMP4';
 const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query';
-// GEMINI_CLI_FMP_URL_CHECK_V1
+// GEMINI_CLI_ALPHA_VANTAGE_CHECK_V1
 // The FMP_API_KEY was 'M5NC0pcUPmjvGTDDnlhWUQkKkTA2QXWn';
 // The FMP_BASE_URL was 'https://financialmodelingprep.com/v3/historical-price-full/';
 
