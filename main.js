@@ -360,13 +360,13 @@ async function fetchAndRecommendStocks() {
         stockElement.setAttribute('name', stock.name);
         stockElement.setAttribute('ticker', stock.ticker);
         stockElement.setAttribute('reason', stock.reason);
-        stockElement.setAttribute('latest-price', stock.latestPrice !== 'N/A' ? stock.latestPrice.toFixed(2) : 'N/A');
-        stockElement.setAttribute('sma20', stock.sma20 !== 'N/A' ? stock.sma20.toFixed(2) : 'N/A');
-        stockElement.setAttribute('rsi14', stock.rsi14 !== 'N/A' ? stock.rsi14.toFixed(2) : 'N/A');
-        stockElement.setAttribute('macd-line', stock.macdLine !== 'N/A' ? stock.macdLine.toFixed(2) : 'N/A');
+        stockElement.setAttribute('latest-price', stock.latestPrice !== 'N/A' ? stock.latestPrice : 'N/A');
+        stockElement.setAttribute('sma20', stock.sma20 !== 'N/A' ? stock.sma20 : 'N/A');
+        stockElement.setAttribute('rsi14', stock.rsi14 !== 'N/A' ? stock.rsi14 : 'N/A');
+        stockElement.setAttribute('macd-line', stock.macdLine !== 'N/A' ? stock.macdLine : 'N/A');
         
-        stockElement.setAttribute('signal-line', stock.signalLine !== 'N/A' ? stock.signalLine.toFixed(2) : 'N/A');
-        stockElement.setAttribute('histogram', stock.histogram !== 'N/A' ? stock.histogram.toFixed(2) : 'N/A');
+        stockElement.setAttribute('signal-line', stock.signalLine !== 'N/A' ? stock.signalLine : 'N/A');
+        stockElement.setAttribute('histogram', stock.histogram !== 'N/A' ? stock.histogram : 'N/A');
         
         stockElement.setAttribute('recommendation', stock.recommendation);
         stockListElement.appendChild(stockElement);
