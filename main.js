@@ -358,6 +358,9 @@ async function fetchAndRecommendStocks() {
             // Always try to get latest price even if data is short
             const latestPrice = prices[prices.length - 1];
 
+            // Introduce a short delay between stock data and news data calls for the same ticker
+            await sleep(2000); // 2 seconds delay
+
             // Fetch news data
             const newsArticles = await fetchNewsData(ticker);
             console.log(`[DEBUG] News articles for ${ticker}:`, newsArticles);
