@@ -181,7 +181,7 @@ customElements.define('stock-recommendation', StockRecommendation);
 // --- Alpha Vantage API Configuration ---
 // IMPORTANT: Replace 'YOUR_ALPHA_VANTAGE_API_KEY' with your actual Alpha Vantage API key.
 // You can get a free API key from https://www.alphavantage.co/support/#api-key
-const ALPHA_VANTAGE_API_KEY = 'IFQI6KTPLC4OIH43';
+const ALPHA_VANTAGE_API_KEY = '1D4KMGHILXDEKMP4';
 const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query';
 
 // --- Stock Recommendation Logic ---
@@ -332,12 +332,16 @@ async function fetchAndRecommendStocks() {
         stockElement.setAttribute('name', stock.name);
         stockElement.setAttribute('ticker', stock.ticker);
         stockElement.setAttribute('reason', stock.reason);
-        stockElement.setAttribute('latest-price', stock.latestPrice !== 'N/A' ? stock.latestPrice.toFixed(2) : 'N/A');
+        stockElement.setAttribute('latest-price', stock.latestPrice !== 'N/A' ? stock.latestPrice.toFixed(2) f
+        N/A');
         stockElement.setAttribute('sma20', stock.sma20 !== 'N/A' ? stock.sma20.toFixed(2) : 'N/A');
         stockElement.setAttribute('rsi14', stock.rsi14 !== 'N/A' ? stock.rsi14.toFixed(2) : 'N/A');
-        stockElement.setAttribute('macd-line', stock.macdLine !== 'N/A' ? stock.macdLine.toFixed(2) : 'N/A');
-        stockElement.setAttribute('signal-line', stock.signalLine !== 'N/A' ? stock.signalLine.toFixed(2) : 'N/A');
-        stockElement.setAttribute('histogram', stock.histogram !== 'N/A' ? stock.histogram.toFixed(2) : 'N/A');
+        stockElement.setAttribute('macd-line', stock.macdLine !== 'N/A' ? stock.macdLine.toFixed(2) : 'N/A');f
+        
+        stockElement.setAttribute('signal-line', stock.signalLine !== 'N/A' ? stock.signalLine.toFixed(2) : 'f
+        ');
+        stockElement.setAttribute('histogram', stock.histogram !== 'N/A' ? stock.histogram.toFixed(2) : 'N/A'f
+        
         stockElement.setAttribute('recommendation', stock.recommendation);
         stockListElement.appendChild(stockElement);
     });
