@@ -323,6 +323,18 @@ async function fetchAndRecommendStocks() {
             });
             console.log(`[DEBUG] ${ticker} Recommendation:`, { recommendation, reason });
             
+            console.log(`[DEBUG] Pushing stock to recommendedStocks for ${ticker}:`, {
+                ticker,
+                name: data['Meta Data']['2. Symbol'] || ticker,
+                latestPrice,
+                sma20: latestSMA20,
+                rsi14: latestRSI14,
+                macdLine: latestMACDLine,
+                signalLine: latestSignalLine,
+                histogram: latestHistogram,
+                recommendation,
+                reason
+            });
             recommendedStocks.push({
                 ticker: ticker,
                 name: data['Meta Data']['2. Symbol'] || ticker, // Use name from API if available
@@ -369,6 +381,7 @@ async function fetchAndRecommendStocks() {
         return;
     }
 
+    console.log("[DEBUG] Starting recommendedStocks.forEach loop.");
     recommendedStocks.forEach(stock => {
         console.log("[DEBUG] Processing stock for rendering:", stock); // Log stock object
         const stockElement = document.createElement('stock-recommendation');
