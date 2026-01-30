@@ -201,7 +201,7 @@ async function fetchAndRecommendStocks() {
 
     for (const ticker of targetTickers) {
         try {
-            const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${ticker}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+            const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${ALPHA_VANTAGE_API_KEY}`;
             const response = await fetch(url);
             const data = await response.json();
 
