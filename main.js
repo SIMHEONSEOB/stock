@@ -185,6 +185,7 @@ class StockRecommendation extends HTMLElement {
 customElements.define('stock-recommendation', StockRecommendation);
 
 // --- Financial Modeling Prep API Configuration ---
+// GEMINI_CLI_FMP_URL_CHECK_V1
 const FMP_API_KEY = 'M5NC0pcUPmjvGTDDnlhWUQkKkTA2QXWn';
 const FMP_BASE_URL = 'https://financialmodelingprep.com/v3/historical-price-full/';
 
