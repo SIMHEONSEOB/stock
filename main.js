@@ -245,9 +245,10 @@ async function fetchAndRecommendStocks() {
             const dates = Object.keys(timeSeries).sort(); // Sort by date ascending
             const prices = dates.map(date => parseFloat(timeSeries[date]['4. close']));
 
-            console.log(`Ticker: ${ticker}, Prices Length: ${prices.length}`); // Debugging line to see data points
+            console.log(`[DEBUG] Ticker: ${ticker}, Prices Length: ${prices.length}`); // Debugging line to see data points
 
             if (prices.length === 0) { // No data at all
+                console.log(`[DEBUG] No prices data for ${ticker}, pushing '데이터 없음' fallback.`);
                 recommendedStocks.push({
                     ticker: ticker,
                     name: data['Meta Data']['2. Symbol'] || ticker,
@@ -255,6 +256,7 @@ async function fetchAndRecommendStocks() {
                     recommendation: '데이터 없음',
                     reason: `데이터를 불러올 수 없습니다. (${ticker})`
                 });
+                // No need for sleep here as we continue.
                 continue;
             }
 
@@ -315,6 +317,58 @@ async function fetchAndRecommendStocks() {
                     }
                 }
             }
+
+            console.log(`[DEBUG] ${ticker} Indicators:`, {
+                latestPrice, latestSMA20, latestRSI14, latestMACDLine, latestSignalLine, latestHistogram
+            });
+            console.log(`[DEBUG] ${ticker} Recommendation:`, { recommendation, reason });
+            
+            recommendedStocks.push({
+                ticker: ticker,
+                name: data['Meta Data']['2. Symbol'] || ticker, // Use name from API if available
+                latestPrice: latestPrice,
+                sma20: latestSMA20,
+                rsi14: latestRSI14,
+                macdLine: latestMACDLine,
+                signalLine: latestSignalLine,
+                histogram: latestHistogram,
+                recommendation: recommendation,
+                reason: reason
+            });
+            console.log(`[DEBUG] recommendedStocks after push for ${ticker}:`, recommendedStocks.length, recommendedStocks);
+
+            // Introduce a delay to respect API rate limits (5 calls per minute for free tier)
+            await sleep(20000); // 20 seconds delay
+
+        } catch (error) {
+            console.error(`Failed to fetch data for ${ticker}:`, error);
+            recommendedStocks.push({
+                ticker: ticker,
+                name: data['Meta Data']['2. Symbol'] || ticker, // Use name from API if available
+                latestPrice: 'N/A',
+                sma20: 'N/A',
+                rsi14: 'N/A',
+                macdLine: 'N/A',
+                signalLine: 'N/A',
+                histogram: 'N/A',
+                recommendation: '오류 발생',
+                reason: `데이터를 불러오는 중 오류가 발생했습니다: ${error.message}`
+            });
+            console.log(`[DEBUG] recommendedStocks after error push for ${ticker}:`, recommendedStocks.length, recommendedStocks);
+            // Still introduce delay even on error to avoid further rate limit issues
+            await sleep(20000); // 20 seconds delay
+        }
+    }
+
+    console.log(`[DEBUG] Final recommendedStocks array before rendering:`, recommendedStocks.length, recommendedStocks);
+    stockListElement.innerHTML = ''; // Clear loading indicator
+
+    if (recommendedStocks.length === 0) {
+        console.warn("[DEBUG] recommendedStocks array is empty, no elements will be rendered.");
+        stockListElement.innerHTML = '<p>표시할 주식 추천이 없습니다.</p>';
+        return;
+    }
+
 
 
 
