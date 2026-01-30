@@ -1,4 +1,3 @@
-
 // Helper function to introduce a delay
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -184,10 +183,12 @@ class StockRecommendation extends HTMLElement {
 
 customElements.define('stock-recommendation', StockRecommendation);
 
-// --- Financial Modeling Prep API Configuration ---
+// --- Alpha Vantage API Configuration ---
+const ALPHA_VANTAGE_API_KEY = '1D4KMGHILXDEKMP4';
+const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query';
 // GEMINI_CLI_FMP_URL_CHECK_V1
-const FMP_API_KEY = 'M5NC0pcUPmjvGTDDnlhWUQkKkTA2QXWn';
-const FMP_BASE_URL = 'https://financialmodelingprep.com/v3/historical-price-full/';
+// The FMP_API_KEY was 'M5NC0pcUPmjvGTDDnlhWUQkKkTA2QXWn';
+// The FMP_BASE_URL was 'https://financialmodelingprep.com/v3/historical-price-full/';
 
 // --- Stock Recommendation Logic ---
 const targetTickers = ['AAPL']; // Reduced to 1 to accommodate Alpha Vantage free tier daily limit
@@ -200,15 +201,14 @@ async function fetchAndRecommendStocks() {
 
     for (const ticker of targetTickers) {
         try {
-            const url = `${FMP_BASE_URL}${ticker}?apikey=${FMP_API_KEY}`;
+            const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${ALPHA_VANTAGE_API_KEY}`;
             const response = await fetch(url);
             const data = await response.json();
             // Always log for debugging
             console.log(`Full API response for ${ticker} (always):`, data);
 
-            // FMP error checking
-            if (!data || !data.historical || data.historical.length === 0) {
-                console.error(`Error fetching data for ${ticker}: No historical data found or invalid symbol.`);
+            if (data['Error Message']) {
+                console.error(`Error fetching data for ${ticker}: ${data['Error Message']}`);
                 recommendedStocks.push({
                     ticker: ticker,
                     name: ticker,
@@ -219,14 +219,30 @@ async function fetchAndRecommendStocks() {
                     signalLine: 'N/A',
                     histogram: 'N/A',
                     recommendation: '데이터 로드 실패',
-                    reason: `데이터를 불러올 수 없습니다: ${ticker}에 대한 과거 데이터를 찾을 수 없거나 잘못된 심볼입니다.`
+                    reason: `데이터를 불러올 수 없습니다: ${data['Error Message']}`
+                });
+                continue;
+            }
+            if (!data['Time Series (Daily)']) {
+                console.warn(`No daily time series data for ${ticker}. Possibly invalid ticker or API limit reached.`);
+                 recommendedStocks.push({
+                    ticker: ticker,
+                    name: ticker,
+                    latestPrice: 'N/A',
+                    sma20: 'N/A',
+                    rsi14: 'N/A',
+                    macdLine: 'N/A',
+                    signalLine: 'N/A',
+                    histogram: 'N/A',
+                    recommendation: '데이터 없음',
+                    reason: `일별 시계열 데이터가 없습니다. (API 한도 도달 또는 잘못된 티커)`
                 });
                 continue;
             }
 
-            const timeSeries = data.historical.reverse(); // FMP returns newest first, reverse for calculations
-            const dates = timeSeries.map(day => day.date);
-            const prices = timeSeries.map(day => parseFloat(day.close));
+            const timeSeries = data['Time Series (Daily)'];
+            const dates = Object.keys(timeSeries).sort(); // Sort by date ascending
+            const prices = dates.map(date => parseFloat(timeSeries[date]['4. close']));
 
             if (prices.length < 30) { // Need enough data for indicators
                 recommendedStocks.push({
@@ -289,7 +305,7 @@ async function fetchAndRecommendStocks() {
 
             recommendedStocks.push({
                 ticker: ticker,
-                name: ticker, // FMP does not directly provide name in this endpoint's historical data, use ticker for now
+                name: data['Meta Data']['2. Symbol'] || ticker, // Use name from API if available
                 latestPrice: latestPrice,
                 sma20: latestSMA20,
                 rsi14: latestRSI14,
