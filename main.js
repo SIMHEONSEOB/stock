@@ -1,4 +1,3 @@
-
 // Helper function to introduce a delay
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -187,9 +186,9 @@ customElements.define('stock-recommendation', StockRecommendation);
 // --- Alpha Vantage API Configuration ---
 const ALPHA_VANTAGE_API_KEY = '1D4KMGHILXDEKMP4';
 const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query';
-// GEMINI_CLI_ALPHA_VANTAGE_CHECK_V1
-// The FMP_API_KEY was 'M5NC0pcUPmjvGTDDnlhWUQkKkTA2QXWn';
-// The FMP_BASE_URL was 'https://financialmodelingprep.com/v3/historical-price-full/';
+// Keeping the FMP key for reference, but it's not being used for API calls
+// const FMP_API_KEY = 'M5NC0pcUPmjvGTDDnlhWUQkKkTA2QXWn';
+// const FMP_BASE_URL = 'https://financialmodelingprep.com/v3/historical-price-full/';
 
 // --- Stock Recommendation Logic ---
 const targetTickers = ['AAPL']; // Reduced to 1 to accommodate Alpha Vantage free tier daily limit
@@ -368,46 +367,6 @@ async function fetchAndRecommendStocks() {
         stockListElement.innerHTML = '<p>표시할 주식 추천이 없습니다.</p>';
         return;
     }
-
-
-
-
-            recommendedStocks.push({
-                ticker: ticker,
-                name: data['Meta Data']['2. Symbol'] || ticker, // Use name from API if available
-                latestPrice: latestPrice,
-                sma20: latestSMA20,
-                rsi14: latestRSI14,
-                macdLine: latestMACDLine,
-                signalLine: latestSignalLine,
-                histogram: latestHistogram,
-                recommendation: recommendation,
-                reason: reason
-            });
-
-            // Introduce a delay to respect API rate limits (5 calls per minute for free tier)
-            await sleep(20000); // 20 seconds delay
-
-        } catch (error) {
-            console.error(`Failed to fetch data for ${ticker}:`, error);
-            recommendedStocks.push({
-                ticker: ticker,
-                name: ticker,
-                latestPrice: 'N/A',
-                sma20: 'N/A',
-                rsi14: 'N/A',
-                macdLine: 'N/A',
-                signalLine: 'N/A',
-                histogram: 'N/A',
-                recommendation: '오류 발생',
-                reason: `데이터를 불러오는 중 오류가 발생했습니다: ${error.message}`
-            });
-            // Still introduce delay even on error to avoid further rate limit issues
-            await sleep(20000); // 20 seconds delay
-        }
-    }
-
-    stockListElement.innerHTML = ''; // Clear loading indicator
 
     recommendedStocks.forEach(stock => {
         const stockElement = document.createElement('stock-recommendation');
