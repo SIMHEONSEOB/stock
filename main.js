@@ -186,7 +186,7 @@ customElements.define('stock-recommendation', StockRecommendation);
 
 // --- Financial Modeling Prep API Configuration ---
 const FMP_API_KEY = 'M5NC0pcUPmjvGTDDnlhWUQkKkTA2QXWn';
-const FMP_BASE_URL = 'https://financialmodelingprep.com/api/v3/historical-price-full/';
+const FMP_BASE_URL = 'https://financialmodelingprep.com/v3/historical-price-full/';
 
 // --- Stock Recommendation Logic ---
 const targetTickers = ['AAPL']; // Reduced to 1 to accommodate Alpha Vantage free tier daily limit
