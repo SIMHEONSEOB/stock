@@ -118,11 +118,28 @@ function calculateMACD(data, fastPeriod, slowPeriod, signalPeriod) {
 class StockRecommendation extends HTMLElement {
     constructor() {
         super();
-        const shadow = this.attachShadow({ mode: 'open' });
+        this.attachShadow({ mode: 'open' }); // Attach shadow DOM in constructor
+    }
 
-        const wrapper = document.createElement('div');
-        wrapper.setAttribute('class', 'stock-card');
+    // Attributes to observe
+    static get observedAttributes() {
+        return ['name', 'ticker', 'reason', 'latest-price', 'sma20', 'rsi14', 'macd-line', 'signal-line', 'histogram', 'recommendation'];
+    }
 
+    connectedCallback() {
+        // Called when the element is inserted into the DOM
+        this.render();
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        // Called when an observed attribute changes
+        if (oldValue !== newValue) {
+            this.render();
+        }
+    }
+
+    render() {
+        // Get attribute values at render time
         const name = this.getAttribute('name');
         const ticker = this.getAttribute('ticker');
         const reason = this.getAttribute('reason');
@@ -133,6 +150,12 @@ class StockRecommendation extends HTMLElement {
         const signalLine = this.getAttribute('signal-line');
         const histogram = this.getAttribute('histogram');
         const recommendation = this.getAttribute('recommendation');
+
+        // Clear existing content
+        this.shadowRoot.innerHTML = '';
+
+        const wrapper = document.createElement('div');
+        wrapper.setAttribute('class', 'stock-card');
 
         wrapper.innerHTML = `
             <h2>${name} (${ticker})</h2>
@@ -148,6 +171,7 @@ class StockRecommendation extends HTMLElement {
                 <div class="chart-placeholder">간단한 차트</div>
             </div>
         `;
+        console.log("[DEBUG] StockRecommendation wrapper.innerHTML:", wrapper.innerHTML);
 
         const style = document.createElement('style');
         style.textContent = `
@@ -176,9 +200,8 @@ class StockRecommendation extends HTMLElement {
             }
         `;
 
-        shadow.appendChild(style);
-        shadow.appendChild(wrapper);
-        console.log("[DEBUG] StockRecommendation wrapper.innerHTML:", wrapper.innerHTML);
+        this.shadowRoot.appendChild(style);
+        this.shadowRoot.appendChild(wrapper);
     }
 }
 
