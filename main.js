@@ -191,7 +191,7 @@ const ALPHA_VANTAGE_API_KEY = '1D4KMGHILXDEKMP4';
 const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query';
 
 // --- Stock Recommendation Logic ---
-const targetTickers = ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'];
+const targetTickers = ['AAPL']; // Reduced to 1 to accommodate Alpha Vantage free tier daily limit
 const stockListElement = document.getElementById('stock-list');
 
 async function fetchAndRecommendStocks() {
