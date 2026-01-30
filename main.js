@@ -1,3 +1,9 @@
+
+// Helper function to introduce a delay
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Helper functions for Technical Indicators
 
 /**
@@ -309,6 +315,9 @@ async function fetchAndRecommendStocks() {
                 reason: reason
             });
 
+            // Introduce a delay to respect API rate limits (5 calls per minute for free tier)
+            await sleep(15000); // 15 seconds delay
+
         } catch (error) {
             console.error(`Failed to fetch data for ${ticker}:`, error);
             recommendedStocks.push({
@@ -323,6 +332,8 @@ async function fetchAndRecommendStocks() {
                 recommendation: '오류 발생',
                 reason: `데이터를 불러오는 중 오류가 발생했습니다: ${error.message}`
             });
+            // Still introduce delay even on error to avoid further rate limit issues
+            await sleep(15000); // 15 seconds delay
         }
     }
 
