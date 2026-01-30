@@ -373,13 +373,18 @@ async function fetchAndRecommendStocks() {
     }
 
     console.log(`[DEBUG] Final recommendedStocks array before rendering:`, recommendedStocks.length, recommendedStocks);
+    console.log(`[DEBUG] Clearing stockListElement.innerHTML. stockListElement is:`, stockListElement);
     stockListElement.innerHTML = ''; // Clear loading indicator
+    console.log(`[DEBUG] stockListElement.innerHTML cleared.`);
+
 
     if (recommendedStocks.length === 0) {
         console.warn("[DEBUG] recommendedStocks array is empty, no elements will be rendered.");
         stockListElement.innerHTML = '<p>표시할 주식 추천이 없습니다.</p>';
         return;
     }
+
+    console.log("[DEBUG] Starting recommendedStocks.forEach loop.");
 
     console.log("[DEBUG] Starting recommendedStocks.forEach loop.");
     recommendedStocks.forEach(stock => {
