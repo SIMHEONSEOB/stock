@@ -245,63 +245,77 @@ async function fetchAndRecommendStocks() {
             const dates = Object.keys(timeSeries).sort(); // Sort by date ascending
             const prices = dates.map(date => parseFloat(timeSeries[date]['4. close']));
 
-            if (prices.length < 30) { // Need enough data for indicators
+            console.log(`Ticker: ${ticker}, Prices Length: ${prices.length}`); // Debugging line to see data points
+
+            if (prices.length === 0) { // No data at all
                 recommendedStocks.push({
                     ticker: ticker,
-                    name: ticker,
-                    latestPrice: prices.length > 0 ? prices[prices.length - 1].toFixed(2) : 'N/A',
-                    sma20: 'N/A',
-                    rsi14: 'N/A',
-                    macdLine: 'N/A',
-                    signalLine: 'N/A',
-                    histogram: 'N/A',
-                    recommendation: '데이터 부족',
-                    reason: `지표 계산에 필요한 데이터가 부족합니다 (${prices.length}개)`
+                    name: data['Meta Data']['2. Symbol'] || ticker,
+                    latestPrice: 'N/A', sma20: 'N/A', rsi14: 'N/A', macdLine: 'N/A', signalLine: 'N/A', histogram: 'N/A',
+                    recommendation: '데이터 없음',
+                    reason: `데이터를 불러올 수 없습니다. (${ticker})`
                 });
                 continue;
             }
 
+            // Always try to get latest price even if data is short
             const latestPrice = prices[prices.length - 1];
 
-            // Calculate Indicators
-            const sma20 = calculateSMA(prices, 20);
-            const latestSMA20 = sma20.length > 0 ? sma20[sma20.length - 1] : 'N/A';
+            let latestSMA20 = 'N/A';
+            let latestRSI14 = 'N/A';
+            let latestMACDLine = 'N/A';
+            let latestSignalLine = 'N/A';
+            let latestHistogram = 'N/A';
 
-            const rsi14 = calculateRSI(prices, 14);
-            const latestRSI14 = rsi14.length > 0 ? rsi14[rsi14.length - 1] : 'N/A';
+            let recommendation = '데이터 부족';
+            let reason = `지표 계산에 필요한 데이터 부족 (${prices.length}개)`;
 
-            const macd = calculateMACD(prices, 12, 26, 9);
-            const latestMACDLine = macd.macdLine.length > 0 ? macd.macdLine[macd.macdLine.length - 1] : 'N/A';
-            const latestSignalLine = macd.signalLine.length > 0 ? macd.signalLine[macd.signalLine.length - 1] : 'N/A';
-            const latestHistogram = macd.histogram.length > 0 ? macd.histogram[macd.histogram.length - 1] : 'N/A';
+            if (prices.length >= 30) { // Enough data for all indicators
+                const sma20 = calculateSMA(prices, 20);
+                latestSMA20 = sma20.length > 0 ? sma20[sma20.length - 1].toFixed(2) : 'N/A';
 
-            // Simple Recommendation Logic
-            let recommendation = '관망';
-            let reason = '지표를 분석 중입니다.';
+                const rsi14 = calculateRSI(prices, 14);
+                latestRSI14 = rsi14.length > 0 ? rsi14[rsi14.length - 1].toFixed(2) : 'N/A';
 
-            // Example Buy Signal: RSI below 30 (oversold) AND MACD crossing above signal line (recent trend up)
-            if (latestRSI14 !== 'N/A' && latestMACDLine !== 'N/A' && latestSignalLine !== 'N/A' &&
-                !isNaN(latestRSI14) && !isNaN(latestMACDLine) && !isNaN(latestSignalLine)) {
+                const macd = calculateMACD(prices, 12, 26, 9);
+                latestMACDLine = macd.macdLine.length > 0 ? macd.macdLine[macd.macdLine.length - 1].toFixed(2) : 'N/A';
+                latestSignalLine = macd.signalLine.length > 0 ? macd.signalLine[macd.signalLine.length - 1].toFixed(2) : 'N/A';
+                latestHistogram = macd.histogram.length > 0 ? macd.histogram[macd.histogram.length - 1].toFixed(2) : 'N/A';
 
-                const prevMACDLine = macd.macdLine[macd.macdLine.length - 2];
-                const prevSignalLine = macd.signalLine[macd.signalLine.length - 2];
+                // Original Simple Recommendation Logic
+                recommendation = '관망';
+                reason = '지표를 분석 중입니다.';
 
-                if (latestRSI14 < 30 && latestMACDLine > latestSignalLine && prevMACDLine <= prevSignalLine) {
-                    recommendation = '매수 추천';
-                    reason = `RSI(14) ${latestRSI14.toFixed(2)}로 과매도 구간이며, MACD선이 시그널선을 상향 돌파했습니다.`;
-                } else if (latestRSI14 > 70 && latestMACDLine < latestSignalLine && prevMACDLine >= prevSignalLine) {
-                    recommendation = '매도 추천';
-                    reason = `RSI(14) ${latestRSI14.toFixed(2)}로 과매수 구간이며, MACD선이 시그널선을 하향 돌파했습니다.`;
-                } else if (latestPrice !== 'N/A' && latestSMA20 !== 'N/A' && !isNaN(latestPrice) && !isNaN(latestSMA20)) {
-                    if (latestPrice > latestSMA20) {
-                        recommendation = '유지 (상승 추세)';
-                        reason = `현재 가격이 SMA(20) 위에 있습니다.`;
-                    } else if (latestPrice < latestSMA20) {
-                        recommendation = '유지 (하락 추세)';
-                        reason = `현재 가격이 SMA(20) 아래에 있습니다.`;
+                if (latestRSI14 !== 'N/A' && latestMACDLine !== 'N/A' && latestSignalLine !== 'N/A' &&
+                    !isNaN(parseFloat(latestRSI14)) && !isNaN(parseFloat(latestMACDLine)) && !isNaN(parseFloat(latestSignalLine))) {
+
+                    const rsiVal = parseFloat(latestRSI14);
+                    const macdVal = parseFloat(latestMACDLine);
+                    const signalVal = parseFloat(latestSignalLine);
+
+                    const prevMACDLine = macd.macdLine[macd.macdLine.length - 2];
+                    const prevSignalLine = macd.signalLine[macd.signalLine.length - 2];
+
+                    if (rsiVal < 30 && macdVal > signalVal && prevMACDLine <= prevSignalLine) {
+                        recommendation = '매수 추천';
+                        reason = `RSI(14) ${rsiVal}로 과매도 구간이며, MACD선이 시그널선을 상향 돌파했습니다.`;
+                    } else if (rsiVal > 70 && macdVal < signalVal && prevMACDLine >= prevSignalLine) {
+                        recommendation = '매도 추천';
+                        reason = `RSI(14) ${rsiVal}로 과매수 구간이며, MACD선이 시그널선을 하향 돌파했습니다.`;
+                    } else if (latestPrice !== 'N/A' && latestSMA20 !== 'N/A' && !isNaN(parseFloat(latestPrice)) && !isNaN(parseFloat(latestSMA20))) {
+                        const priceVal = parseFloat(latestPrice);
+                        const smaVal = parseFloat(latestSMA20);
+                        if (priceVal > smaVal) {
+                            recommendation = '유지 (상승 추세)';
+                            reason = `현재 가격이 SMA(20) 위에 있습니다.`;
+                        } else if (priceVal < smaVal) {
+                            recommendation = '유지 (하락 추세)';
+                            reason = `현재 가격이 SMA(20) 아래에 있습니다.`;
+                        }
                     }
                 }
             }
+
 
 
             recommendedStocks.push({
