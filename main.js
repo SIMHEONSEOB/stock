@@ -204,6 +204,7 @@ async function fetchAndRecommendStocks() {
             const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${ALPHA_VANTAGE_API_KEY}`;
             const response = await fetch(url);
             const data = await response.json();
+            console.log(`Full API response for ${ticker} (always):`, data); // Always log for debugging
 
             if (data['Error Message']) {
                 console.error(`Error fetching data for ${ticker}: ${data['Error Message']}`);
@@ -223,7 +224,6 @@ async function fetchAndRecommendStocks() {
             }
             if (!data['Time Series (Daily)']) {
                 console.warn(`No daily time series data for ${ticker}. Possibly invalid ticker or API limit reached.`);
-                console.log(`Full API response for ${ticker}:`, data); // Added for debugging
                  recommendedStocks.push({
                     ticker: ticker,
                     name: ticker,
