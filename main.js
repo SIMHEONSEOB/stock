@@ -178,96 +178,173 @@ class StockRecommendation extends HTMLElement {
 
 customElements.define('stock-recommendation', StockRecommendation);
 
-// --- Mock Historical Data ---
-// In a real application, this data would be fetched from a financial API.
-const historicalData = {
-    'AAPL': [170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 198, 195, 192, 190, 188, 185, 183, 180], // 40 days
-    'MSFT': [290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 318, 315, 312, 310, 308, 305, 303, 300], // 40 days
-    'AMZN': [130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 158, 155, 152, 150, 148, 145, 143, 140], // 40 days
-    'GOOGL': [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 128, 125, 122, 120, 118, 115, 113, 110], // 40 days
-    'NVDA': [400, 405, 410, 415, 420, 425, 430, 435, 440, 445, 450, 455, 460, 465, 470, 475, 480, 485, 490, 495, 500, 505, 510, 515, 520, 525, 530, 535, 540, 545, 550, 540, 530, 520, 510, 500, 490, 480, 470] // 40 days
-};
+// --- Alpha Vantage API Configuration ---
+// IMPORTANT: Replace 'YOUR_ALPHA_VANTAGE_API_KEY' with your actual Alpha Vantage API key.
+// You can get a free API key from https://www.alphavantage.co/support/#api-key
+const ALPHA_VANTAGE_API_KEY = 'IFQI6KTPLC4OIH43';
+const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query';
 
 // --- Stock Recommendation Logic ---
-const recommendedStocks = [];
+const targetTickers = ['AAPL', 'MSFT', 'AMZN', 'GOOGL', 'NVDA'];
+const stockListElement = document.getElementById('stock-list');
 
-for (const ticker in historicalData) {
-    const prices = historicalData[ticker];
-    if (prices.length < 30) continue; // Need enough data for indicators
+async function fetchAndRecommendStocks() {
+    stockListElement.innerHTML = '<p>주식 데이터를 불러오는 중입니다...</p>'; // Loading indicator
 
-    const latestPrice = prices[prices.length - 1];
+    const recommendedStocks = [];
 
-    // Calculate Indicators
-    const sma20 = calculateSMA(prices, 20);
-    const latestSMA20 = sma20.length > 0 ? sma20[sma20.length - 1] : 'N/A';
+    for (const ticker of targetTickers) {
+        try {
+            const url = `${ALPHA_VANTAGE_BASE_URL}?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${ticker}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+            const response = await fetch(url);
+            const data = await response.json();
 
-    const rsi14 = calculateRSI(prices, 14);
-    const latestRSI14 = rsi14.length > 0 ? rsi14[rsi14.length - 1] : 'N/A';
+            if (data['Error Message']) {
+                console.error(`Error fetching data for ${ticker}: ${data['Error Message']}`);
+                recommendedStocks.push({
+                    ticker: ticker,
+                    name: ticker,
+                    latestPrice: 'N/A',
+                    sma20: 'N/A',
+                    rsi14: 'N/A',
+                    macdLine: 'N/A',
+                    signalLine: 'N/A',
+                    histogram: 'N/A',
+                    recommendation: '데이터 로드 실패',
+                    reason: `데이터를 불러올 수 없습니다: ${data['Error Message']}`
+                });
+                continue;
+            }
+            if (!data['Time Series (Daily)']) {
+                console.warn(`No daily time series data for ${ticker}. Possibly invalid ticker or API limit reached.`);
+                 recommendedStocks.push({
+                    ticker: ticker,
+                    name: ticker,
+                    latestPrice: 'N/A',
+                    sma20: 'N/A',
+                    rsi14: 'N/A',
+                    macdLine: 'N/A',
+                    signalLine: 'N/A',
+                    histogram: 'N/A',
+                    recommendation: '데이터 없음',
+                    reason: `일별 시계열 데이터가 없습니다. (API 한도 도달 또는 잘못된 티커)`
+                });
+                continue;
+            }
 
-    const macd = calculateMACD(prices, 12, 26, 9);
-    const latestMACDLine = macd.macdLine.length > 0 ? macd.macdLine[macd.macdLine.length - 1] : 'N/A';
-    const latestSignalLine = macd.signalLine.length > 0 ? macd.signalLine[macd.signalLine.length - 1] : 'N/A';
-    const latestHistogram = macd.histogram.length > 0 ? macd.histogram[macd.histogram.length - 1] : 'N/A';
+            const timeSeries = data['Time Series (Daily)'];
+            const dates = Object.keys(timeSeries).sort(); // Sort by date ascending
+            const prices = dates.map(date => parseFloat(timeSeries[date]['4. close']));
 
-    // Simple Recommendation Logic
-    let recommendation = '관망';
-    let reason = '지표를 분석 중입니다.';
+            if (prices.length < 30) { // Need enough data for indicators
+                recommendedStocks.push({
+                    ticker: ticker,
+                    name: ticker,
+                    latestPrice: prices.length > 0 ? prices[prices.length - 1].toFixed(2) : 'N/A',
+                    sma20: 'N/A',
+                    rsi14: 'N/A',
+                    macdLine: 'N/A',
+                    signalLine: 'N/A',
+                    histogram: 'N/A',
+                    recommendation: '데이터 부족',
+                    reason: `지표 계산에 필요한 데이터가 부족합니다 (${prices.length}개)`
+                });
+                continue;
+            }
 
-    // Example Buy Signal: RSI below 30 (oversold) AND MACD crossing above signal line (recent trend up)
-    if (latestRSI14 !== 'N/A' && latestMACDLine !== 'N/A' && latestSignalLine !== 'N/A') {
-        if (latestRSI14 < 30 && latestMACDLine > latestSignalLine && macd.macdLine[macd.macdLine.length - 2] <= macd.signalLine[macd.signalLine.length - 2]) {
-            recommendation = '매수 추천';
-            reason = `RSI(14)가 ${latestRSI14.toFixed(2)}로 과매도 구간이며, MACD선이 시그널선을 상향 돌파했습니다.`;
-        } else if (latestRSI14 > 70 && latestMACDLine < latestSignalLine && macd.macdLine[macd.macdLine.length - 2] >= macd.signalLine[macd.signalLine.length - 2]) {
-            recommendation = '매도 추천';
-            reason = `RSI(14)가 ${latestRSI14.toFixed(2)}로 과매수 구간이며, MACD선이 시그널선을 하향 돌파했습니다.`;
-        } else if (latestPrice > latestSMA20) {
-            recommendation = '유지 (상승 추세)';
-            reason = `현재 가격이 SMA(20) 위에 있습니다.`;
-        } else if (latestPrice < latestSMA20) {
-            recommendation = '유지 (하락 추세)';
-            reason = `현재 가격이 SMA(20) 아래에 있습니다.`;
+            const latestPrice = prices[prices.length - 1];
+
+            // Calculate Indicators
+            const sma20 = calculateSMA(prices, 20);
+            const latestSMA20 = sma20.length > 0 ? sma20[sma20.length - 1] : 'N/A';
+
+            const rsi14 = calculateRSI(prices, 14);
+            const latestRSI14 = rsi14.length > 0 ? rsi14[rsi14.length - 1] : 'N/A';
+
+            const macd = calculateMACD(prices, 12, 26, 9);
+            const latestMACDLine = macd.macdLine.length > 0 ? macd.macdLine[macd.macdLine.length - 1] : 'N/A';
+            const latestSignalLine = macd.signalLine.length > 0 ? macd.signalLine[macd.signalLine.length - 1] : 'N/A';
+            const latestHistogram = macd.histogram.length > 0 ? macd.histogram[macd.histogram.length - 1] : 'N/A';
+
+            // Simple Recommendation Logic
+            let recommendation = '관망';
+            let reason = '지표를 분석 중입니다.';
+
+            // Example Buy Signal: RSI below 30 (oversold) AND MACD crossing above signal line (recent trend up)
+            if (latestRSI14 !== 'N/A' && latestMACDLine !== 'N/A' && latestSignalLine !== 'N/A' &&
+                !isNaN(latestRSI14) && !isNaN(latestMACDLine) && !isNaN(latestSignalLine)) {
+
+                const prevMACDLine = macd.macdLine[macd.macdLine.length - 2];
+                const prevSignalLine = macd.signalLine[macd.signalLine.length - 2];
+
+                if (latestRSI14 < 30 && latestMACDLine > latestSignalLine && prevMACDLine <= prevSignalLine) {
+                    recommendation = '매수 추천';
+                    reason = `RSI(14) ${latestRSI14.toFixed(2)}로 과매도 구간이며, MACD선이 시그널선을 상향 돌파했습니다.`;
+                } else if (latestRSI14 > 70 && latestMACDLine < latestSignalLine && prevMACDLine >= prevSignalLine) {
+                    recommendation = '매도 추천';
+                    reason = `RSI(14) ${latestRSI14.toFixed(2)}로 과매수 구간이며, MACD선이 시그널선을 하향 돌파했습니다.`;
+                } else if (latestPrice !== 'N/A' && latestSMA20 !== 'N/A' && !isNaN(latestPrice) && !isNaN(latestSMA20)) {
+                    if (latestPrice > latestSMA20) {
+                        recommendation = '유지 (상승 추세)';
+                        reason = `현재 가격이 SMA(20) 위에 있습니다.`;
+                    } else if (latestPrice < latestSMA20) {
+                        recommendation = '유지 (하락 추세)';
+                        reason = `현재 가격이 SMA(20) 아래에 있습니다.`;
+                    }
+                }
+            }
+
+
+            recommendedStocks.push({
+                ticker: ticker,
+                name: data['Meta Data']['2. Symbol'] || ticker, // Use name from API if available
+                latestPrice: latestPrice,
+                sma20: latestSMA20,
+                rsi14: latestRSI14,
+                macdLine: latestMACDLine,
+                signalLine: latestSignalLine,
+                histogram: latestHistogram,
+                recommendation: recommendation,
+                reason: reason
+            });
+
+        } catch (error) {
+            console.error(`Failed to fetch data for ${ticker}:`, error);
+            recommendedStocks.push({
+                ticker: ticker,
+                name: ticker,
+                latestPrice: 'N/A',
+                sma20: 'N/A',
+                rsi14: 'N/A',
+                macdLine: 'N/A',
+                signalLine: 'N/A',
+                histogram: 'N/A',
+                recommendation: '오류 발생',
+                reason: `데이터를 불러오는 중 오류가 발생했습니다: ${error.message}`
+            });
         }
     }
 
+    stockListElement.innerHTML = ''; // Clear loading indicator
 
-    recommendedStocks.push({
-        ticker: ticker,
-        name: {
-            'AAPL': 'Apple Inc.',
-            'MSFT': 'Microsoft Corp.',
-            'AMZN': 'Amazon.com Inc.',
-            'GOOGL': 'Alphabet Inc. (Google)',
-            'NVDA': 'NVIDIA Corp.'
-        }[ticker] || ticker,
-        latestPrice: latestPrice,
-        sma20: latestSMA20,
-        rsi14: latestRSI14,
-        macdLine: latestMACDLine,
-        signalLine: latestSignalLine,
-        histogram: latestHistogram,
-        recommendation: recommendation,
-        reason: reason
+    recommendedStocks.forEach(stock => {
+        const stockElement = document.createElement('stock-recommendation');
+        stockElement.setAttribute('name', stock.name);
+        stockElement.setAttribute('ticker', stock.ticker);
+        stockElement.setAttribute('reason', stock.reason);
+        stockElement.setAttribute('latest-price', stock.latestPrice !== 'N/A' ? stock.latestPrice.toFixed(2) : 'N/A');
+        stockElement.setAttribute('sma20', stock.sma20 !== 'N/A' ? stock.sma20.toFixed(2) : 'N/A');
+        stockElement.setAttribute('rsi14', stock.rsi14 !== 'N/A' ? stock.rsi14.toFixed(2) : 'N/A');
+        stockElement.setAttribute('macd-line', stock.macdLine !== 'N/A' ? stock.macdLine.toFixed(2) : 'N/A');
+        stockElement.setAttribute('signal-line', stock.signalLine !== 'N/A' ? stock.signalLine.toFixed(2) : 'N/A');
+        stockElement.setAttribute('histogram', stock.histogram !== 'N/A' ? stock.histogram.toFixed(2) : 'N/A');
+        stockElement.setAttribute('recommendation', stock.recommendation);
+        stockListElement.appendChild(stockElement);
     });
 }
 
-const stockListElement = document.getElementById('stock-list');
-stockListElement.innerHTML = ''; // Clear existing content
-
-recommendedStocks.forEach(stock => {
-    const stockElement = document.createElement('stock-recommendation');
-    stockElement.setAttribute('name', stock.name);
-    stockElement.setAttribute('ticker', stock.ticker);
-    stockElement.setAttribute('reason', stock.reason);
-    stockElement.setAttribute('latest-price', stock.latestPrice.toFixed(2));
-    stockElement.setAttribute('sma20', stock.sma20 !== 'N/A' ? stock.sma20.toFixed(2) : 'N/A');
-    stockElement.setAttribute('rsi14', stock.rsi14 !== 'N/A' ? stock.rsi14.toFixed(2) : 'N/A');
-    stockElement.setAttribute('macd-line', stock.macdLine !== 'N/A' ? stock.macdLine.toFixed(2) : 'N/A');
-    stockElement.setAttribute('signal-line', stock.signalLine !== 'N/A' ? stock.signalLine.toFixed(2) : 'N/A');
-    stockElement.setAttribute('histogram', stock.histogram !== 'N/A' ? stock.histogram.toFixed(2) : 'N/A');
-    stockElement.setAttribute('recommendation', stock.recommendation);
-    stockListElement.appendChild(stockElement);
-});
+// Initial call to fetch and recommend stocks
+fetchAndRecommendStocks();
 
 // --- Theme Toggle Script ---
 const themeToggle = document.getElementById('theme-toggle');
