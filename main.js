@@ -293,7 +293,7 @@ async function fetchNewsData(ticker) {
 }
 
 async function fetchAndRecommendStocks() {
-    stockListElement.innerHTML = '<p>주식 데이터를 불러오는 중입니다...</p>'; // Loading indicator
+    stockListElement.innerHTML = '<div class="loading-spinner"></div><p>주식 데이터를 불러오는 중입니다...</p>'; // Loading indicator
 
     const recommendedStocks = [];
 
@@ -360,12 +360,11 @@ async function fetchAndRecommendStocks() {
             // Always try to get latest price even if data is short
             const latestPrice = prices[prices.length - 1];
 
-            // Introduce a short delay between stock data and news data calls for the same ticker
-            await sleep(2000); // 2 seconds delay
-
-            // Fetch news data
-            const newsArticles = await fetchNewsData(ticker);
-            console.log(`[DEBUG] News articles for ${ticker}:`, newsArticles);
+            // Temporarily disable news fetching for debugging stock data
+            // await sleep(2000); // 2 seconds delay
+            // const newsArticles = await fetchNewsData(ticker);
+            // console.log(`[DEBUG] News articles for ${ticker}:`, newsArticles);
+            const newsArticles = []; // Empty array when news fetching is disabled
 
             let latestSMA20 = 'N/A';
             let latestRSI14 = 'N/A';
