@@ -178,6 +178,7 @@ class StockRecommendation extends HTMLElement {
 
         shadow.appendChild(style);
         shadow.appendChild(wrapper);
+        console.log("[DEBUG] StockRecommendation wrapper.innerHTML:", wrapper.innerHTML);
     }
 }
 
