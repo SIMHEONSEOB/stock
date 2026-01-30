@@ -370,6 +370,7 @@ async function fetchAndRecommendStocks() {
     }
 
     recommendedStocks.forEach(stock => {
+        console.log("[DEBUG] Processing stock for rendering:", stock); // Log stock object
         const stockElement = document.createElement('stock-recommendation');
         stockElement.setAttribute('name', stock.name);
         stockElement.setAttribute('ticker', stock.ticker);
@@ -384,6 +385,7 @@ async function fetchAndRecommendStocks() {
         
         stockElement.setAttribute('recommendation', stock.recommendation);
         stockListElement.appendChild(stockElement);
+        console.log("[DEBUG] Stock element appended:", stockElement); // Confirm append
     });
 }
 
