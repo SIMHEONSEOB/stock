@@ -6,7 +6,6 @@
     <title>StockPro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header>
@@ -100,26 +99,25 @@
         </aside>
     </div>
 
-    <div id="chart-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>주가 차트 (<span id="modal-ticker">AAPL</span>)</h2>
-            <div style="height:400px; width:100%;">
-                <canvas id="stock-chart"></canvas>
+        <!-- Chart Modal -->
+        <div id="chart-modal" class="modal">
+            <div class="modal-content chart-modal-content">
+                <span id="chart-close-button" class="close-button">&times;</span>
+                <div id="chart-container"></div>
             </div>
         </div>
-    </div>
 
-    <div id="news-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>최신 뉴스 (<span id="modal-news-ticker">AAPL</span>)</h2>
-            <div id="news-content">
-                <p>뉴스를 불러오는 중...</p>
+        <div id="news-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>최신 뉴스 (<span id="modal-news-ticker">AAPL</span>)</h2>
+                <div id="news-content">
+                    <p>뉴스를 불러오는 중...</p>
+                </div>
             </div>
         </div>
-    </div>
 
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <script src="main.js"></script>
 </body>
 </html>

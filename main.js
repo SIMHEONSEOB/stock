@@ -182,12 +182,20 @@ async function fetchAndRenderStockData(ticker = 'AAPL') {
             return;
         }
 
-        const prices = dates.map(date => parseFloat(timeSeries[date]['4. close']));
+        const ohlcData = dates.map(date => ({
+            time: date,
+            open: parseFloat(timeSeries[date]['1. open']),
+            high: parseFloat(timeSeries[date]['2. high']),
+            low: parseFloat(timeSeries[date]['3. low']),
+            close: parseFloat(timeSeries[date]['4. close']),
+        }));
+        const prices = dates.map(date => parseFloat(timeSeries[date]['4. close'])); // For indicator calculations
         const volumes = dates.map(date => parseInt(timeSeries[date]['5. volume']));
 
         // Store for chart
+        stockData.ohlcData = ohlcData; // Store OHLC data for Lightweight Charts
         stockData.dates = dates;
-        stockData.prices = prices;
+        stockData.prices = prices; // Keep prices array for indicator calculations
         stockData.ticker = ticker;
         stockData.companyName = data['Meta Data']['2. Symbol'];
 
@@ -261,6 +269,11 @@ async function fetchAndRenderStockData(ticker = 'AAPL') {
         priceChangeElement.textContent = `${priceChange > 0 ? '+' : ''}${priceChange.toFixed(2)} (${priceChangePercent.toFixed(2)}%)`;
         priceChangeElement.className = `data-value ${priceChange > 0 ? 'positive' : 'negative'}`;
 
+        // Update price change indicator color
+        const priceChangeIndicator = document.getElementById('price-change-indicator');
+        priceChangeIndicator.style.backgroundColor = priceChange > 0 ? '#2eb85c' : '#ff4d4f'; // Green for positive, Red for negative
+
+
         document.getElementById('volume-value').textContent = `${(latestVolume / 1000000).toFixed(2)}M`;
         // Market Cap is not provided by Alpha Vantage daily series, using a placeholder
         document.getElementById('market-cap-value').textContent = '$TBD'; // Placeholder
@@ -291,103 +304,87 @@ async function fetchAndRenderStockData(ticker = 'AAPL') {
 
 // --- Chart Rendering ---
 
-function renderChartModal() {
-    const modal = document.getElementById('chart-modal');
-    const ctx = document.getElementById('stock-chart').getContext('2d');
+let chart = null; // Lightweight Charts instance
 
-    if (chartInstance) {
-        chartInstance.destroy(); // Destroy previous chart instance if exists
-    }
+const displayStockChart = async () => {
+    const chartContainer = document.getElementById('chart-container');
+    chartContainer.innerHTML = ''; // Clear previous chart if any
 
-    if (!stockData.prices || stockData.prices.length === 0 || !stockData.dates || stockData.dates.length === 0) {
-        console.warn('No stock data available for chart rendering.');
-        // Optionally display a message in the modal
+    if (!stockData.ohlcData || stockData.ohlcData.length === 0) {
+        console.warn('No OHLC data available for chart rendering.');
+        chartContainer.innerHTML = '<p style="color: #c9d1d9; text-align: center; padding-top: 50px;">차트 데이터를 불러올 수 없습니다.</p>';
         return;
     }
 
-    chartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: stockData.dates.slice(-60), // Show last 60 days
-            datasets: [{
-                label: `${stockData.companyName} (${stockData.ticker}) 종가`,
-                data: stockData.prices.slice(-60),
-                borderColor: 'rgb(0, 82, 255)',
-                backgroundColor: 'rgba(0, 82, 255, 0.1)',
-                borderWidth: 2,
-                pointRadius: 0, // No points for cleaner line
-                fill: true,
-                tension: 0.2
-            }]
+    // Initialize the chart
+    chart = LightweightCharts.createChart(chartContainer, {
+        layout: {
+            background: { color: '#111827' },
+            textColor: 'rgba(255, 255, 255, 0.9)',
+            fontFamily: 'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            font: { // Global font settings for the chart
-                family: 'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+        grid: {
+            vertLines: { color: '#334155' },
+            horzLines: { color: '#334155' },
+        },
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        rightPriceScale: {
+            borderColor: '#485c7b',
+            scaleMargins: {
+                top: 0.1,
+                bottom: 0.25,
             },
-            plugins: {
-                legend: {
-                    display: true,
-                    labels: {
-                        color: '#1a1a1a', // Matching body text color
-                        font: {
-                            size: 14
-                        }
-                    }
-                },
-                title: {
-                    display: true,
-                    text: `${stockData.companyName} (${stockData.ticker}) 주가 변동`,
-                    color: '#1a1a1a', // Matching body text color
-                    font: {
-                        size: 18,
-                        weight: 'bold'
-                    }
-                }
+        },
+        timeScale: {
+            borderColor: '#485c7b',
+            timeVisible: true,
+            secondsVisible: false,
+            // Adjusting font of time scale
+            barSpacing: 10, // Default is 6, wider bars
+            rightOffset: 12, // Offset from the right of the chart
+            minBarSpacing: 5,
+            tickMarkFormatter: (time) => {
+                const date = new Date(time * 1000); // Lightweight Charts uses Unix timestamp in seconds
+                return date.toLocaleDateString('ko-KR'); // Format date as desired
             },
-            scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: {
-                        color: '#5e5e5e', // Matching secondary text color
-                        font: {
-                            size: 12
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: '날짜',
-                        color: '#1a1a1a', // Matching body text color
-                        font: {
-                            size: 14
-                        }
-                    }
-                },
-                y: {
-                    grid: { color: '#eef0f4' }, // Light grid lines
-                    ticks: {
-                        color: '#5e5e5e', // Matching secondary text color
-                        font: {
-                            size: 12
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: '가격 (USD)',
-                        color: '#1a1a1a', // Matching body text color
-                        font: {
-                            size: 14
-                        }
-                    }
-                }
-            }
-        }
+        },
     });
 
-    document.getElementById('modal-ticker').textContent = stockData.ticker;
-    modal.style.display = 'flex'; // Use flex to center
-}
+    // Add candlestick series
+    const candleSeries = chart.addCandlestickSeries({
+        upColor: '#3b82f6',     // 상승: 파란색
+        downColor: '#ef4444',   // 하락: 빨간색
+        borderDownColor: '#ef4444',
+        borderUpColor: '#3b82f6',
+        wickDownColor: '#ef4444',
+        wickUpColor: '#3b82f6',
+    });
+
+    // Set data for the series, using the last 60 days
+    candleSeries.setData(stockData.ohlcData.slice(-60).map(d => ({
+        time: Math.floor(new Date(d.time).getTime() / 1000), // Convert date string to Unix timestamp in seconds
+        open: d.open,
+        high: d.high,
+        low: d.low,
+        close: d.close,
+    })));
+
+    // Fit chart to data
+    chart.timeScale().fitContent();
+
+    // Set title dynamically
+    chart.applyOptions({
+        watermark: {
+            visible: true,
+            fontSize: 24,
+            horzAlign: 'left',
+            vertAlign: 'top',
+            color: 'rgba(255, 255, 255, 0.5)',
+            text: `${stockData.companyName} (${stockData.ticker})`,
+        },
+    });
+
+};
 
 
 // --- News Rendering ---
@@ -416,7 +413,7 @@ async function renderNewsModal() {
     }
 
     document.getElementById('modal-news-ticker').textContent = stockData.ticker || 'AAPL';
-    modal.style.display = 'flex';
+    modal.classList.add('show');
 }
 
 
@@ -428,21 +425,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // Chart Modal Logic
     const chartActionBtn = document.getElementById('chart-action-btn');
     const chartModal = document.getElementById('chart-modal');
-    const chartCloseBtn = chartModal.querySelector('.close-button');
+    const chartCloseBtn = document.getElementById('chart-close-button'); // Use specific ID for chart close button
 
     chartActionBtn.addEventListener('click', () => {
-        if (stockData.prices && stockData.dates) {
-            renderChartModal();
+        if (stockData.ohlcData && stockData.ohlcData.length > 0) {
+            chartModal.classList.add('show');
+            // Ensure chart renders after modal is visible
+            requestAnimationFrame(() => {
+                displayStockChart();
+            });
         } else {
             alert('차트 데이터를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
         }
     });
     chartCloseBtn.addEventListener('click', () => {
-        chartModal.style.display = 'none';
+        chartModal.classList.remove('show');
+        if (chart) {
+            chart.remove(); // Dispose chart instance
+            chart = null;
+        }
     });
     window.addEventListener('click', (event) => {
         if (event.target == chartModal) {
-            chartModal.style.display = 'none';
+            chartModal.classList.remove('show');
+            if (chart) {
+                chart.remove();
+                chart = null;
+            }
         }
     });
 
@@ -455,11 +464,11 @@ document.addEventListener('DOMContentLoaded', () => {
         renderNewsModal();
     });
     newsCloseBtn.addEventListener('click', () => {
-        newsModal.style.display = 'none';
+        newsModal.classList.remove('show');
     });
     window.addEventListener('click', (event) => {
         if (event.target == newsModal) {
-            newsModal.style.display = 'none';
+            newsModal.classList.remove('show');
         }
     });
 });
