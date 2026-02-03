@@ -1,62 +1,99 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="light">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>미국 주식 추천</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>StockPro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>미국 주식 종목 추천</h1>
-        <p>AI 분석 주식 정보 (현재 AAPL 단일 종목)</p>
-        <button id="theme-toggle">모드 전환</button>
+        <div class="logo">
+            <span class="logo-s">S</span> StockPro
+        </div>
+        <nav>
+            <a href="#">홈</a>
+            <a href="#">종목 분석</a>
+            <a href="#">뉴스</a>
+        </nav>
     </header>
-    <main id="stock-list">
-        <!-- 주식 추천 정보가 여기에 동적으로 추가됩니다. -->
+
+    <main>
+        <section class="stock-recommendation">
+            <h2>미국 주식 종목 추천</h2>
+            <p>AI 분석 주식 정보 (현재 AAPL 단일 종목)</p>
+            <button class="view-today">오늘 전망</button>
+        </section>
+
+        <section class="stock-details">
+            <div class="stock-header">
+                <div>
+                    <h2>AAPL (AAPL)</h2>
+                    <span class="status">유지 (상승 추세)</span>
+                </div>
+                <div class="price">
+                    $270.01
+                    <span>최신 가격</span>
+                </div>
+            </div>
+
+            <div class="indicators">
+                <div class="indicator">
+                    <p>SMA(20)</p>
+                    <p>257.60</p>
+                </div>
+                <div class="indicator">
+                    <p>RSI(14)</p>
+                    <p>62.48</p>
+                </div>
+                <div class="indicator">
+                    <p>MACD 값</p>
+                    <p>-2.19</p>
+                </div>
+                <div class="indicator">
+                    <p>시그널 값</p>
+                    <p>-4.03</p>
+                </div>
+                <div class="indicator">
+                    <p>히스토그램</p>
+                    <p>1.85</p>
+                </div>
+                <div class="indicator">
+                    <p>추천</p>
+                    <p>유지</p>
+                </div>
+            </div>
+
+            <div class="ai-analysis">
+                <h3>AI 분석 사유</h3>
+                <p>현재 가격이 SMA(20) 위에 있습니다.</p>
+            </div>
+
+            <div class="actions">
+                <button class="chart-btn">간단한 차트</button>
+                <button class="news-btn">관련 뉴스</button>
+            </div>
+        </section>
+
+        <section class="related-news">
+            <h3>관련 뉴스</h3>
+            <div class="no-news">
+                <p>관련 뉴스를 찾을 수 없습니다.</p>
+            </div>
+        </section>
+
+        <section class="feedback">
+            <h3>What do you think?</h3>
+            <div class="reactions">
+                <button><span>👍</span> Upvote</button>
+                <button><span>😂</span> Funny</button>
+                <button><span>😍</span> Love</button>
+                <button><span>😮</span> Surprised</button>
+                <button><span>😡</span> Angry</button>
+                <button class="active"><span>😢</span> Sad</button>
+            </div>
+        </section>
     </main>
 
-    <div id="disqus_thread"></div>
-    <script>
-        /**
-        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
-
-        var disqus_config = function () {
-        this.page.url = window.location.href;  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = 'index-page'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-        };
-
-        (function() { // DON'T EDIT BELOW THIS LINE
-        var d = document, s = d.createElement('script');
-        s.src = 'https://productbuilder-swgduw46uf.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-        })();
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-
-    <section id="contact-form">
-        <h2>제휴 문의</h2>
-        <form action="https://formspree.io/f/xwvbldpe" method="POST">
-            <label for="name">이름:</label>
-            <input type="text" id="name" name="name" required>
-
-            <label for="email">이메일:</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="message">문의 내용:</label>
-            <textarea id="message" name="message" rows="5" required></textarea>
-
-            <button type="submit">제출하기</button>
-        </form>
-    </section>
-
-    <footer>
-        <p>본 정보는 투자 참고용이며, 투자 판단의 최종 책임은 투자자 본인에게 있습니다.</p>
-    </footer>
-
-    <script src="main.js"></script>
 </body>
 </html>

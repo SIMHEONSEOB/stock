@@ -1,271 +1,181 @@
-:root {
-    --bg-color: #f0f2f5;
-    --header-bg-color: #fff;
-    --card-bg-color: #fff;
-    --text-color: #212529;
-    --subtle-text-color: #666;
-    --border-color: #ddd;
-    --shadow-color: rgba(0,0,0,0.1);
-    --link-color: #007bff;
-}
-
-[data-theme='dark'] {
-    --bg-color: #1a1a1a;
-    --header-bg-color: #2b2b2b;
-    --card-bg-color: #2b2b2b;
-    --text-color: #e0e0e0;
-    --subtle-text-color: #aaa;
-    --border-color: #444;
-    --shadow-color: rgba(255,255,255,0.1);
-    --link-color: #66aaff;
-}
 
 body {
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #111827;
+    color: #FFFFFF;
+    font-family: sans-serif;
     margin: 0;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    transition: background-color 0.2s, color 0.2s;
-    line-height: 1.6;
+    padding: 20px;
 }
 
 header {
-    background-color: var(--header-bg-color);
-    padding: 20px;
-    text-align: center;
-    border-bottom: 1px solid var(--border-color);
-    transition: background-color 0.2s, border-bottom 0.2s;
-    box-shadow: 0 2px 4px var(--shadow-color);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
 }
 
-header h1 {
-    margin: 0 0 5px 0;
-    color: var(--text-color);
+.logo {
+    font-size: 24px;
+    font-weight: bold;
 }
 
-header p {
-    margin: 0 0 10px 0;
-    color: var(--subtle-text-color);
-    font-size: 0.9em;
-}
-
-#theme-toggle {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-    padding: 8px 15px;
+.logo-s {
+    background-color: #4A5568;
+    padding: 5px 10px;
     border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-    font-size: 0.9em;
+    margin-right: 5px;
 }
 
-#theme-toggle:hover {
-    background-color: var(--subtle-text-color);
-    color: var(--header-bg-color);
+nav a {
+    color: #A0AEC0;
+    text-decoration: none;
+    margin-left: 20px;
 }
-
 
 main {
-    padding: 20px;
     max-width: 800px;
-    margin: 20px auto;
-    background-color: var(--card-bg-color); /* To contain loading spinner/no-data message */
-    border-radius: 8px;
-    box-shadow: 0 2px 8px var(--shadow-color);
-    min-height: 100px; /* Ensure some height for loading spinner */
-    display: flex; /* For centering loading spinner */
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    margin: 0 auto;
 }
 
-main > p { /* Styling for '주식 데이터를 불러오는 중입니다...' and '표시할 주식 추천이 없습니다.' */
-    color: var(--subtle-text-color);
-    font-size: 1.1em;
+.stock-recommendation {
     text-align: center;
+    margin-bottom: 40px;
 }
 
-footer {
-    text-align: center;
+.stock-recommendation h2 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.view-today {
+    background: linear-gradient(to right, #8B5CF6, #EC4899);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.stock-details {
+    background-color: #1F2937;
+    border-radius: 10px;
     padding: 20px;
-    margin-top: 40px;
-    font-size: 0.85em;
-    color: var(--subtle-text-color);
-    border-top: 1px solid var(--border-color);
-}
-
-stock-recommendation {
-    display: block;
-    background-color: var(--card-bg-color);
-    border-radius: 8px;
-    box-shadow: 0 2px 4px var(--shadow-color);
     margin-bottom: 20px;
-    padding: 20px;
-    transition: background-color 0.2s;
-    width: 100%; /* Ensure it takes full width of main container */
-    box-sizing: border-box; /* Include padding in width */
 }
 
-stock-recommendation h2 {
-    margin-top: 0;
-    color: var(--text-color);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
-    margin-bottom: 15px;
+.stock-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-stock-recommendation .stock-info {
-    display: grid; /* Use grid for better alignment of stock details */
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+.status {
+    background-color: #10B981;
+    color: #FFFFFF;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+}
+
+.price {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.price span {
+    font-size: 14px;
+    color: #A0AEC0;
+    display: block;
+}
+
+.indicators {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     margin-bottom: 20px;
 }
 
-stock-recommendation p {
-    margin: 5px 0;
-    color: var(--text-color);
+.indicator {
+    background-color: #374151;
+    padding: 15px;
+    border-radius: 5px;
 }
 
-stock-recommendation strong {
-    color: var(--text-color);
+.indicator p:first-child {
+    color: #A0AEC0;
+    margin: 0 0 5px 0;
 }
 
-stock-recommendation .chart-placeholder {
-    width: 100%;
-    height: 120px;
-    background-color: var(--bg-color);
+.indicator p:last-child {
+    font-size: 20px;
+    margin: 0;
+}
+
+.ai-analysis {
+    background-color: #374151;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.chart-btn, .news-btn {
+    flex: 1;
+    padding: 15px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.chart-btn {
+    background-color: #3B82F6;
+    color: white;
+}
+
+.news-btn {
+    background-color: #4A5568;
+    color: #A0AEC0;
+}
+
+.related-news {
+    background-color: #1F2937;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.no-news {
+    text-align: center;
+    color: #A0AEC0;
+    padding: 40px 0;
+}
+
+.feedback {
+    text-align: center;
+}
+
+.reactions {
     display: flex;
     justify-content: center;
-    align-items: center;
-    color: var(--subtle-text-color);
-    font-style: italic;
-    border-radius: 5px;
-    margin-top: 15px;
-    transition: background-color 0.2s, color 0.2s;
+    gap: 10px;
 }
 
-stock-recommendation .stock-news h3 {
-    margin-top: 20px;
-    border-top: 1px solid var(--border-color);
-    padding-top: 15px;
-    margin-bottom: 15px;
-    color: var(--text-color);
-}
-
-stock-recommendation .news-list {
-    list-style: none;
-    padding: 0;
-}
-
-stock-recommendation .news-list li {
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed var(--border-color);
-}
-
-stock-recommendation .news-list li:last-child {
-    border-bottom: none;
-}
-
-stock-recommendation .news-list a {
-    color: var(--link-color);
-    text-decoration: none;
-    font-weight: bold;
-}
-
-stock-recommendation .news-list a:hover {
-    text-decoration: underline;
-}
-
-stock-recommendation .news-source {
-    display: block;
-    font-size: 0.8em;
-    color: var(--subtle-text-color);
-    margin-top: 5px;
-}
-
-/* Loading Spinner CSS */
-.loading-spinner {
-    border: 4px solid var(--border-color);
-    border-top: 4px solid var(--link-color); /* Use a theme color for the spinner */
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
-    margin: 20px auto; /* Center the spinner */
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-#contact-form {
-    background-color: var(--card-bg-color);
-    border-radius: 8px;
-    box-shadow: 0 2px 4px var(--shadow-color);
-    margin: 20px auto; /* Center with auto margins */
-    max-width: 800px; /* Match main max-width */
-    padding: 20px;
-    transition: background-color 0.2s;
-}
-
-#contact-form h2 {
-    color: var(--text-color);
-    margin-top: 0;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
-}
-
-#contact-form form {
-    display: flex;
-    flex-direction: column;
-}
-
-#contact-form label {
-    margin-bottom: 5px;
-    color: var(--text-color);
-    font-weight: bold;
-}
-
-#contact-form input[type="text"],
-#contact-form input[type="email"],
-#contact-form textarea {
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background-color: var(--bg-color); /* Use general background for input */
-    color: var(--text-color);
-    transition: border-color 0.2s, background-color 0.2s, color 0.2s;
-    font-size: 1em;
-}
-
-#contact-form input[type="text"]:focus,
-#contact-form input[type="email"]:focus,
-#contact-form textarea:focus {
-    border-color: var(--link-color); /* Highlight focus */
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-#contact-form button[type="submit"] {
-    background-color: var(--link-color);
-    color: white;
-    padding: 12px 20px;
+.reactions button {
+    background-color: #374151;
+    color: #A0AEC0;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
+    padding: 10px 15px;
     cursor: pointer;
-    font-size: 1.1em;
-    transition: background-color 0.2s;
-    align-self: flex-start; /* Align button to start */
 }
 
-#contact-form button[type="submit"]:hover {
-    background-color: #0056b3;
+.reactions button.active {
+    background-color: #3B82F6;
+    color: white;
 }
