@@ -323,34 +323,62 @@ function renderChartModal() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            font: { // Global font settings for the chart
+                family: 'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+            },
             plugins: {
                 legend: {
                     display: true,
-                    labels: { color: '#1a1a1a' }
+                    labels: {
+                        color: '#1a1a1a', // Matching body text color
+                        font: {
+                            size: 14
+                        }
+                    }
                 },
                 title: {
                     display: true,
                     text: `${stockData.companyName} (${stockData.ticker}) 주가 변동`,
-                    color: '#1a1a1a'
+                    color: '#1a1a1a', // Matching body text color
+                    font: {
+                        size: 18,
+                        weight: 'bold'
+                    }
                 }
             },
             scales: {
                 x: {
                     grid: { display: false },
-                    ticks: { color: '#5e5e5e' },
+                    ticks: {
+                        color: '#5e5e5e', // Matching secondary text color
+                        font: {
+                            size: 12
+                        }
+                    },
                     title: {
                         display: true,
                         text: '날짜',
-                        color: '#1a1a1a'
+                        color: '#1a1a1a', // Matching body text color
+                        font: {
+                            size: 14
+                        }
                     }
                 },
                 y: {
-                    grid: { color: '#eef0f4' },
-                    ticks: { color: '#5e5e5e' },
+                    grid: { color: '#eef0f4' }, // Light grid lines
+                    ticks: {
+                        color: '#5e5e5e', // Matching secondary text color
+                        font: {
+                            size: 12
+                        }
+                    },
                     title: {
                         display: true,
                         text: '가격 (USD)',
-                        color: '#1a1a1a'
+                        color: '#1a1a1a', // Matching body text color
+                        font: {
+                            size: 14
+                        }
                     }
                 }
             }
