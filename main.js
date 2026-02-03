@@ -119,22 +119,25 @@ class StockRecommendation extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' }); // Attach shadow DOM in constructor
+        this.chart = null; // To hold the chart instance
     }
 
     // Attributes to observe
     static get observedAttributes() {
-        return ['name', 'ticker', 'reason', 'latest-price', 'sma20', 'rsi14', 'macd-line', 'signal-line', 'histogram', 'recommendation', 'news'];
+        return ['name', 'ticker', 'reason', 'latest-price', 'sma20', 'rsi14', 'macd-line', 'signal-line', 'histogram', 'recommendation', 'news', 'prices', 'dates'];
     }
 
     connectedCallback() {
         // Called when the element is inserted into the DOM
         this.render();
+        this.renderChart();
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
         // Called when an observed attribute changes
         if (oldValue !== newValue) {
             this.render();
+            this.renderChart();
         }
     }
 
@@ -194,8 +197,8 @@ class StockRecommendation extends HTMLElement {
                 <p><strong>히스토그램:</strong> ${histogram}</p>
                 <p><strong>추천:</strong> ${recommendation}</p>
                 <p><strong>사유:</strong> ${reason}</p>
-                <div class="chart-placeholder">간단한 차트</div>
             </div>
+            <div class="chart-container" style="height:200px; width:100%;"><canvas class="stock-chart"></canvas></div>
             <div class="stock-news">
                 ${newsHtml}
             </div>
@@ -215,17 +218,6 @@ class StockRecommendation extends HTMLElement {
                 border-bottom: 1px solid var(--border-color);
                 padding-bottom: 20px;
                 transition: border-bottom 0.2s;
-            }
-            .chart-placeholder {
-                width: 150px;
-                height: 80px;
-                background-color: var(--bg-color);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                color: var(--subtle-text-color);
-                transition: background-color 0.2s, color 0.2s;
-                margin-top: 10px;
             }
             .news-list {
                 list-style: none;
@@ -249,6 +241,63 @@ class StockRecommendation extends HTMLElement {
 
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(wrapper);
+    }
+
+    renderChart() {
+        const pricesString = this.getAttribute('prices');
+        const datesString = this.getAttribute('dates');
+
+        if (!pricesString || !datesString) {
+            return;
+        }
+
+        const prices = JSON.parse(pricesString);
+        const dates = JSON.parse(datesString);
+
+        if (!Array.isArray(prices) || !Array.isArray(dates) || prices.length === 0 || dates.length === 0) {
+            return;
+        }
+
+        const ctx = this.shadowRoot.querySelector('.stock-chart').getContext('2d');
+        
+        if (this.chart) {
+            this.chart.destroy();
+        }
+
+        this.chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates.slice(-30),
+                datasets: [{
+                    label: '종가',
+                    data: prices.slice(-30),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: '날짜'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: '가격 (USD)'
+                        }
+                    }
+                }
+            }
+        });
     }
 }
 
@@ -449,7 +498,9 @@ async function fetchAndRecommendStocks() {
                 histogram: latestHistogram,
                 recommendation: recommendation,
                 reason: reason,
-                news: newsArticles // Add news articles here
+                news: newsArticles, // Add news articles here
+                prices: prices,
+                dates: dates
             });
             console.log(`[DEBUG] recommendedStocks after push for ${ticker}:`, recommendedStocks.length, recommendedStocks);
 
@@ -505,6 +556,12 @@ async function fetchAndRecommendStocks() {
         
         stockElement.setAttribute('recommendation', stock.recommendation);
         stockElement.setAttribute('news', JSON.stringify(stock.news));
+        if (stock.prices) {
+            stockElement.setAttribute('prices', JSON.stringify(stock.prices));
+        }
+        if (stock.dates) {
+            stockElement.setAttribute('dates', JSON.stringify(stock.dates));
+        }
         stockListElement.appendChild(stockElement);
         console.log("[DEBUG] Stock element appended:", stockElement); // Confirm append
     });
