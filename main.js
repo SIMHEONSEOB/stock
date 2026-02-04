@@ -7,7 +7,6 @@ const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query';
 // --- Helper Functions ---
 
 
-
 /**
  * Calculates Simple Moving Average (SMA).
  * @param {Array<number>} data - Array of closing prices.
@@ -445,16 +444,14 @@ async function fetchAndRecommendStocks() {
             if (data['Error Message']) {
                 console.error(`Error fetching data for ${ticker}: ${data['Error Message']}`);
                 // Display user-friendly message about API limit
-                stockListElement.innerHTML = `<p style="color: red; text-align: center;">데이터 로드 실패: ${data['Error Message']}. API 호출 제한에 도달했거나 API 키가 유효하지 않을 수 있습니다. Alpha Vantage API 키를 확인하거나 잠시 후 다시 시도해주세요.</p>`;
- // Wait even on error to prevent rapid re-attempts
-                return; // Stop processing further if API limit hit
+                stockListElement.innerHTML = `<p style="color: red; text-align: center;">데이터 로드 실패: ${data['Error Message']}. API 호출 제한에 도달했거나 API 키가 유효하지 않을 수 있습니다. Alpha Vantage API 키를 확인하거나 다음 날까지 기다려주세요 (일일 25회 요청 제한).</p>`;
+                return;
             }
             if (!data['Time Series (Daily)']) {
                 console.warn(`No daily time series data for ${ticker}. Possibly invalid ticker or API limit reached.`);
                 // Display user-friendly message about API limit
-                stockListElement.innerHTML = `<p style="color: red; text-align: center;">데이터 로드 실패: ${ticker}에 대한 일별 시계열 데이터가 없습니다. API 호출 제한에 도달했거나 티커가 잘못되었을 수 있습니다. Alpha Vantage API 키를 확인하거나 잠시 후 다시 시도해주세요.</p>`;
-
-                return; // Stop processing further if API limit hit
+                stockListElement.innerHTML = `<p style="color: red; text-align: center;">데이터 로드 실패: ${ticker}에 대한 일별 시계열 데이터가 없습니다. API 호출 제한에 도달했거나 티커가 잘못되었을 수 있습니다. Alpha Vantage API 키를 확인하거나 다음 날까지 기다려주세요 (일일 25회 요청 제한).</p>`;
+                return;
             }
 
             const timeSeries = data['Time Series (Daily)'];
@@ -470,7 +467,6 @@ async function fetchAndRecommendStocks() {
                     recommendation: '데이터 없음',
                     reason: `데이터를 불러올 수 없습니다. (${ticker})`
                 });
-
                 continue;
             }
 
@@ -565,18 +561,10 @@ async function fetchAndRecommendStocks() {
                 dates: dates
             });
 
-            await sleep(15000); // 15 seconds delay to respect Alpha Vantage API rate limits (5 calls per minute)
-
         } catch (error) {
             console.error(`Failed to fetch data for ${ticker}:`, error);
-            recommendedStocks.push({
-                ticker: ticker,
-                name: ticker,
-                latestPrice: 'N/A', sma20: 'N/A', rsi14: 'N/A', macdLine: 'N/A', signalLine: 'N/A', histogram: 'N/A',
-                recommendation: '오류 발생',
-                reason: `데이터를 불러오는 중 오류가 발생했습니다: ${error.message}`
-            });
-            await sleep(15000);
+            stockListElement.innerHTML = `<p style="color: red; text-align: center;">데이터 로드 중 오류 발생: ${error.message}. Alpha Vantage API 키를 확인하거나 다음 날까지 기다려주세요 (일일 25회 요청 제한).</p>`;
+            return;
         }
     }
 
@@ -619,40 +607,4 @@ async function fetchAndRecommendStocks() {
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndRecommendStocks(); // Initial call to fetch and recommend stocks
-
-    // Original chart and news modal logic (now simplified as these are managed by custom elements)
-    // The chart and news modals were for single stock view, which is now replaced by multiple stock cards.
-    // However, the overall page might still have these elements, so we need to ensure they don't break.
-
-    // Chart Modal Logic (removed direct chart rendering, will be handled by custom elements)
-    const chartActionBtn = document.getElementById('chart-action-btn');
-    if (chartActionBtn) {
-        chartActionBtn.addEventListener('click', () => {
-            alert('개별 주식 차트는 해당 카드에서 확인해주세요.'); // Inform user
-        });
-    }
-
-    // News Modal Logic (removed direct news rendering, will be handled by custom elements)
-    const newsActionBtn = document.getElementById('news-action-btn');
-    const newsModal = document.getElementById('news-modal');
-    const newsCloseBtn = newsModal ? newsModal.querySelector('.close-button') : null;
-
-    if (newsActionBtn) {
-        newsActionBtn.addEventListener('click', () => {
-             alert('개별 주식 뉴스는 해당 카드에서 확인해주세요.'); // Inform user
-        });
-    }
-     if (newsCloseBtn) {
-        newsCloseBtn.addEventListener('click', () => {
-            newsModal.classList.remove('show');
-        });
-    }
-    if (newsModal) {
-        window.addEventListener('click', (event) => {
-            if (event.target == newsModal) {
-                newsModal.classList.remove('show');
-            }
-        });
-    }
-
 });
