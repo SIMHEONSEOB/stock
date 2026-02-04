@@ -1,7 +1,29 @@
 /* General Body and Font styles */
+:root {
+    --background-color: #ffffff;
+    --text-color: #1a1a1a;
+    --subtle-text-color: #5e5e5e;
+    --link-color: #0052ff;
+    --border-color: #f0f0f0;
+    --card-background-color: #f7f9fb;
+    --card-border-color: #eef0f4;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #1a1a1a;
+        --text-color: #f7f9fb;
+        --subtle-text-color: #b0b0b0;
+        --link-color: #6495ED; /* Lighter blue for dark mode */
+        --border-color: #333d4e;
+        --card-background-color: #1f2937;
+        --card-border-color: #333d4e;
+    }
+}
+
 body {
-    background-color: #ffffff;
-    color: #1a1a1a;
+    background-color: var(--background-color);
+    color: var(--text-color);
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     margin: 0;
 }
@@ -32,9 +54,10 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 16px 40px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border-color);
     max-width: 1200px;
     margin: 0 auto;
+    background-color: var(--background-color);
 }
 
 .logo {
@@ -53,7 +76,7 @@ header {
 }
 
 nav a {
-    color: #5e5e5e;
+    color: var(--subtle-text-color);
     text-decoration: none;
     margin-left: 20px;
     font-size: 16px;
@@ -63,16 +86,14 @@ nav a {
 }
 
 nav a.active {
-    background-color: #f0f5ff;
-    color: #0052ff;
+    background-color: var(--card-border-color);
+    color: var(--link-color);
 }
 
 /* Main Content Sections */
 .ai-today-recommendation,
-.stock-info,
-.ai-analysis-section,
-.quick-actions,
-.ai-tip {
+.stock-list,
+.quick-actions {
     border-radius: 16px;
     margin-bottom: 24px;
 }
@@ -94,166 +115,36 @@ nav a.active {
     opacity: 0.9;
 }
 
-.stock-info, .ai-analysis-section {
-    background-color: #f7f9fb;
-    padding: 24px;
-}
-
-/* Stock Info Section */
-.stock-info-header {
+/* Stock List Section (for custom elements) */
+.stock-list {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.stock-info-header h1 {
-    margin: 0;
-    font-size: 28px;
+/* Styles for the stock-recommendation custom element (within its shadow DOM) */
+stock-recommendation {
+    display: block;
 }
 
-.stock-info-header .ticker {
-    color: #5e5e5e;
-    margin: 4px 0 0 0;
-    font-size: 16px;
-}
-
-.details-link {
-    background-color: #eef0f4;
-    color: #5e5e5e;
-    font-size: 14px;
-    padding: 6px 10px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.price-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 16px 0 8px 0;
-}
-
-.price-value {
-    font-size: 44px;
-    font-weight: bold;
-}
-
-.price-change-indicator {
-    width: 50px;
-    height: 28px;
-    background-color: #ff4d4f;
-    border-radius: 6px;
-}
-
-.price-date {
-    color: #8c8c8c;
-    font-size: 14px;
-    margin: 0 0 24px 0;
-}
-
-.market-data {
-    display: flex;
-    justify-content: space-between;
-    padding-top: 24px;
-    border-top: 1px solid #eef0f4;
-}
-
-.market-data .data-label {
-    color: #8c8c8c;
-    font-size: 14px;
-    margin: 0 0 4px 0;
-}
-
-.market-data .data-value {
-    font-size: 16px;
-    font-weight: 500;
-    margin: 0;
-}
-.market-data .data-value.positive {
-    color: #ff4d4f;
-}
-
-
-/* AI Analysis Section */
-.ai-analysis-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-.ai-analysis-header h2 {
-    font-size: 20px;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.status-tag {
-    background-color: #2eb85c;
-    color: white;
-    font-size: 14px;
-    padding: 6px 12px;
+stock-recommendation::part(stock-card) {
+    background-color: var(--card-background-color);
     border-radius: 16px;
-    font-weight: bold;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: background-color 0.3s ease;
 }
-.reason-box {
-    background-color: white;
-    padding: 16px;
-    border-radius: 12px;
-    margin-bottom: 16px;
-}
-.reason-title {
-    font-size: 14px;
-    font-weight: bold;
-    margin: 0 0 8px 0;
-}
-.reason-text {
-    font-size: 14px;
-    margin: 0;
-    color: #5e5e5e;
-}
-
-.mini-indicators {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-}
-.mini-indicator {
-    background-color: white;
-    text-align: center;
-    padding: 12px;
-    border-radius: 12px;
-}
-.mini-indicator .indicator-label {
-    font-size: 12px;
-    color: #8c8c8c;
-    margin: 0 0 4px 0;
-}
-.mini-indicator .indicator-value {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 0 0 4px 0;
-}
-.mini-indicator .indicator-status {
-    font-size: 12px;
-    font-weight: bold;
-    margin: 0;
-}
-.indicator-status.green { color: #2eb85c; }
-.indicator-status.red { color: #ff4d4f; }
-.indicator-status.gray { color: #8c8c8c; }
-
 
 /* Sidebar */
 .sidebar h3 {
     font-size: 18px;
     margin: 0 0 16px 0;
     padding: 0 8px;
+    color: var(--text-color);
 }
 .quick-actions {
     padding: 16px;
-    background-color: #f7f9fb;
+    background-color: var(--card-background-color);
 }
 .quick-actions .action-btn {
     display: flex;
@@ -267,9 +158,10 @@ nav a.active {
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
-    background-color: #eef0f4;
-    color: #5e5e5e;
+    background-color: var(--card-border-color);
+    color: var(--subtle-text-color);
     text-align: left;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 .quick-actions .action-btn:last-child {
     margin-bottom: 0;
@@ -278,118 +170,10 @@ nav a.active {
     background-color: #0052ff;
     color: white;
 }
-.ai-tip {
-    background-color: #f0f5ff;
-    padding: 16px;
-}
-.ai-tip h3 {
-    color: #0052ff;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 16px;
-    margin: 0 0 12px 0;
-    padding: 0;
-}
-.ai-tip p {
-    margin: 0;
-    color: #0052ff;
-    opacity: 0.9;
-    font-size: 14px;
-    line-height: 1.5;
-}
 
 /* Modal Styles */
 .modal {
     display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background-color: #f7f9fb;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #eef0f4;
-    border-radius: 16px;
-    width: 90%;
-    max-width: 800px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    position: relative;
-    color: #1a1a1a;
-}
-
-.modal-content h2 {
-    margin-top: 0;
-    color: #0052ff;
-    font-size: 24px;
-    border-bottom: 1px solid #eef0f4;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-}
-
-.modal-content #news-content {
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 10px; /* For scrollbar */
-}
-
-.modal-content #news-content .news-item {
-    margin-bottom: 15px;
-    padding-bottom: 15px;
-    border-bottom: 1px dashed #eef0f4;
-}
-
-.modal-content #news-content .news-item:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-.modal-content #news-content .news-item a {
-    font-weight: bold;
-    color: #0052ff;
-    text-decoration: none;
-    display: block;
-    margin-bottom: 5px;
-}
-
-.modal-content #news-content .news-item a:hover {
-    text-decoration: underline;
-}
-
-.modal-content #news-content .news-item .news-meta {
-    font-size: 12px;
-    color: #8c8c8c;
-}
-
-.close-button {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    position: absolute;
-    top: 15px;
-    right: 25px;
-    cursor: pointer;
-}
-
-.close-button:hover,
-.close-button:focus {
-    color: white;
-}
-
-/* Modal Base Styles */
-.modal {
-    display: none; /* 기본적으로 숨김 */
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -437,6 +221,21 @@ nav a.active {
 .close-button:hover,
 .close-button:focus {
     color: white;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3; /* Light grey */
+    border-top: 4px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 2s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 

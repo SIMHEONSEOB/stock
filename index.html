@@ -26,78 +26,20 @@
                 <p>실시간 데이터 분석으로 최적의 타이밍을 알려드려요</p>
             </section>
 
-            <section class="stock-info">
-                <div class="stock-info-header">
-                    <div>
-                        <h1 id="stock-name">Apple Inc.</h1>
-                        <p id="stock-ticker" class="ticker">AAPL</p>
-                    </div>
-                    <a href="#" class="details-link">상세 ></a>
-                </div>
-                <div class="price-section">
-                    <span id="price-value" class="price-value">$270.01</span>
-                    <span id="price-change-indicator" class="price-change-indicator"></span>
-                </div>
-                <p id="price-date" class="price-date">2024.01.15 기준</p>
-
-                <div class="market-data">
-                    <div>
-                        <p class="data-label">전일 대비</p>
-                        <p id="price-change-value" class="data-value positive">+13.05</p>
-                    </div>
-                    <div>
-                        <p class="data-label">거래량</p>
-                        <p id="volume-value" class="data-value">257.60M</p>
-                    </div>
-                    <div>
-                        <p class="data-label">시가총액</p>
-                        <p id="market-cap-value" class="data-value">$4.2T</p>
-                    </div>
-                </div>
+            <section class="stock-list" id="stock-list">
+                <!-- Stock recommendations will be dynamically loaded here -->
             </section>
 
-            <section class="ai-analysis-section">
-                 <div class="ai-analysis-header">
-                    <h2><span class="icon">🤖</span> AI 분석</h2>
-                    <span id="rec-value-tag" class="status-tag">유지</span>
-                </div>
-                <div class="reason-box">
-                    <p class="reason-title">📈 추천 이유</p>
-                    <p id="ai-reason" class="reason-text">현재 가격이 SMA(20) 위에 있습니다.</p>
-                </div>
-                <div class="mini-indicators">
-                    <div class="mini-indicator">
-                        <p class="indicator-label">RSI(14)</p>
-                        <p id="rsi-value" class="indicator-value">62.48</p>
-                        <p id="rsi-status" class="indicator-status green">중립</p>
-                    </div>
-                    <div class="mini-indicator">
-                        <p class="indicator-label">MACD</p>
-                        <p id="macd-value" class="indicator-value">-2.19</p>
-                        <p id="macd-status" class="indicator-status red">약세</p>
-                    </div>
-                    <div class="mini-indicator">
-                        <p class="indicator-label">시그널</p>
-                        <p id="signal-value" class="indicator-value">-4.03</p>
-                        <p id="signal-status" class="indicator-status gray">확인</p>
-                    </div>
-                </div>
-            </section>
-
-        </main>
-        <aside class="sidebar">
-            <section class="quick-actions">
-                <h3>빠른 액션</h3>
-                <button id="chart-action-btn" class="action-btn active"><span>📊</span> 차트 보기</button>
-                <button id="news-action-btn" class="action-btn"><span>📰</span> 뉴스 보기</button>
-                <button class="action-btn"><span>🔔</span> 알림 설정</button>
-            </section>
-            <section class="ai-tip">
-                 <h3><span>💡</span> AI TIP</h3>
-                 <p>SMA(20)은 20일 이동평균선을 의미하며, 주가 추세를 판단하는 데 사용됩니다.</p>
-            </section>
-        </aside>
-    </div>
+            </main>
+            <aside class="sidebar">
+                <section class="quick-actions">
+                    <h3>빠른 액션</h3>
+                    <button id="chart-action-btn" class="action-btn active"><span>📊</span> 차트 보기</button>
+                    <button id="news-action-btn" class="action-btn"><span>📰</span> 뉴스 보기</button>
+                    <button class="action-btn"><span>🔔</span> 알림 설정</button>
+                </section>
+            </aside>
+            </div>
 
         <!-- Chart Modal -->
         <div id="chart-modal" class="modal">
