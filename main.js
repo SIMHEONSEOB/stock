@@ -401,7 +401,7 @@ class StockRecommendation extends HTMLElement {
 customElements.define('stock-recommendation', StockRecommendation);
 
 // --- Main Data Fetching and UI Update Logic ---
-const targetTickers = ['AAPL']; // Changed to only AAPL for testing
+const targetTickers = ['NVDA']; // Set to NVIDIA (NVDA) as requested
 const stockListElement = document.getElementById('stock-list');
 
 async function fetchNewsData(ticker) {
