@@ -1,18 +1,12 @@
 // --- Global Variables ---
-const ALPHA_VANTAGE_API_KEY = '1D4KMGHILXDEKMP4'; // Replace with your actual Alpha Vantage API Key
+const ALPHA_VANTAGE_API_KEY = 'IHC7LZN85GHVR5UT'; // Replace with your actual Alpha Vantage API Key
 const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query';
 // No global chart instance needed now as charts are per custom element
 // No global stockData needed as each stock's data is passed to its custom element
 
 // --- Helper Functions ---
 
-/**
- * Introduces a delay.
- * @param {number} ms - Milliseconds to sleep.
- */
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+
 
 /**
  * Calculates Simple Moving Average (SMA).
@@ -408,7 +402,7 @@ class StockRecommendation extends HTMLElement {
 customElements.define('stock-recommendation', StockRecommendation);
 
 // --- Main Data Fetching and UI Update Logic ---
-const targetTickers = ['AAPL', 'MSFT', 'GOOGL', 'JNJ', 'PG', 'KO']; // Blue-chip stocks
+const targetTickers = ['AAPL']; // Changed to only AAPL for testing
 const stockListElement = document.getElementById('stock-list');
 
 async function fetchNewsData(ticker) {
@@ -450,27 +444,17 @@ async function fetchAndRecommendStocks() {
 
             if (data['Error Message']) {
                 console.error(`Error fetching data for ${ticker}: ${data['Error Message']}`);
-                recommendedStocks.push({
-                    ticker: ticker,
-                    name: ticker,
-                    latestPrice: 'N/A', sma20: 'N/A', rsi14: 'N/A', macdLine: 'N/A', signalLine: 'N/A', histogram: 'N/A',
-                    recommendation: '데이터 로드 실패',
-                    reason: `데이터를 불러올 수 없습니다: ${data['Error Message']}`
-                });
-                await sleep(13000); // Wait even on error to prevent rapid re-attempts
-                continue;
+                // Display user-friendly message about API limit
+                stockListElement.innerHTML = `<p style="color: red; text-align: center;">데이터 로드 실패: ${data['Error Message']}. API 호출 제한에 도달했거나 API 키가 유효하지 않을 수 있습니다. Alpha Vantage API 키를 확인하거나 잠시 후 다시 시도해주세요.</p>`;
+ // Wait even on error to prevent rapid re-attempts
+                return; // Stop processing further if API limit hit
             }
             if (!data['Time Series (Daily)']) {
                 console.warn(`No daily time series data for ${ticker}. Possibly invalid ticker or API limit reached.`);
-                 recommendedStocks.push({
-                    ticker: ticker,
-                    name: ticker,
-                    latestPrice: 'N/A', sma20: 'N/A', rsi14: 'N/A', macdLine: 'N/A', signalLine: 'N/A', histogram: 'N/A',
-                    recommendation: '데이터 없음',
-                    reason: `일별 시계열 데이터가 없습니다. (API 한도 도달 또는 잘못된 티커)`
-                });
-                await sleep(13000);
-                continue;
+                // Display user-friendly message about API limit
+                stockListElement.innerHTML = `<p style="color: red; text-align: center;">데이터 로드 실패: ${ticker}에 대한 일별 시계열 데이터가 없습니다. API 호출 제한에 도달했거나 티커가 잘못되었을 수 있습니다. Alpha Vantage API 키를 확인하거나 잠시 후 다시 시도해주세요.</p>`;
+
+                return; // Stop processing further if API limit hit
             }
 
             const timeSeries = data['Time Series (Daily)'];
@@ -486,7 +470,7 @@ async function fetchAndRecommendStocks() {
                     recommendation: '데이터 없음',
                     reason: `데이터를 불러올 수 없습니다. (${ticker})`
                 });
-                await sleep(13000);
+
                 continue;
             }
 
@@ -494,7 +478,7 @@ async function fetchAndRecommendStocks() {
             
             // Fetch news data concurrently if possible, or sequentially if API demands
             const newsArticles = await fetchNewsData(ticker); // Fetch news
-            await sleep(1000); // Small delay after news fetch
+
 
             let latestSMA20 = 'N/A';
             let latestRSI14 = 'N/A';
@@ -581,7 +565,7 @@ async function fetchAndRecommendStocks() {
                 dates: dates
             });
 
-            await sleep(13000); // 13 seconds delay to respect Alpha Vantage API rate limits (5 calls per minute)
+            await sleep(15000); // 15 seconds delay to respect Alpha Vantage API rate limits (5 calls per minute)
 
         } catch (error) {
             console.error(`Failed to fetch data for ${ticker}:`, error);
@@ -592,7 +576,7 @@ async function fetchAndRecommendStocks() {
                 recommendation: '오류 발생',
                 reason: `데이터를 불러오는 중 오류가 발생했습니다: ${error.message}`
             });
-            await sleep(13000);
+            await sleep(15000);
         }
     }
 
