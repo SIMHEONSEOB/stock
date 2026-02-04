@@ -33,9 +33,46 @@
 
             </main>
             <aside class="sidebar">
-                <!-- Quick actions removed as their functionality is now integrated into stock cards -->
+                <section class="quick-actions">
+                    <h3>빠른 액션</h3>
+                    <button id="calculator-action-btn" class="action-btn"><span>🧮</span> 배당금 복리 계산기</button>
+                </section>
             </aside>
             </div>
+
+        <!-- Dividend Calculator Modal -->
+        <div id="dividend-calculator-modal" class="modal">
+            <div class="modal-content">
+                <span id="calculator-close-button" class="close-button">&times;</span>
+                <h2>💰 배당금 복리 계산기</h2>
+                <div class="calculator-form">
+                    <div class="form-group">
+                        <label for="initialInvestment">초기 투자금 (원):</label>
+                        <input type="number" id="initialInvestment" value="1000000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="annualDividendYield">연간 배당 수익률 (%):</label>
+                        <input type="number" id="annualDividendYield" value="4" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="annualContribution">연간 추가 투자금 (원):</label>
+                        <input type="number" id="annualContribution" value="100000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="investmentPeriod">투자 기간 (년):</label>
+                        <input type="number" id="investmentPeriod" value="10" min="1">
+                    </div>
+                    <button id="calculate-dividend" class="action-btn">계산하기</button>
+                </div>
+                <div class="calculator-result">
+                    <h3>계산 결과:</h3>
+                    <p>최종 자산: <span id="finalAsset">0</span> 원</p>
+                    <p>총 배당금: <span id="totalDividends">0</span> 원</p>
+                    <p>총 투자금: <span id="totalInvestment">0</span> 원</p>
+                    <p>수익률: <span id="roi">0</span> %</p>
+                </div>
+            </div>
+        </div>
 
         <!-- Chart Modal -->
         <div id="chart-modal" class="modal">
@@ -48,7 +85,7 @@
         <div id="news-modal" class="modal">
             <div class="modal-content">
                 <span class="close-button">&times;</span>
-                <h2>최신 뉴스 (<span id="modal-news-ticker">AAPL</span>)</h2>
+                <h2>최신 뉴스 (<span id="modal-news-ticker">NVDA</span>)</h2>
                 <div id="news-content">
                     <p>뉴스를 불러오는 중...</p>
                 </div>

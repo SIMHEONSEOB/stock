@@ -236,7 +236,49 @@ stock-recommendation::part(stock-card) {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}/* Calculator specific styles */
+.calculator-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
 
+.form-group label {
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: var(--text-color);
+}
 
+.form-group input[type="number"] {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.calculator-result h3 {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    font-size: 18px;
+    color: var(--text-color);
+}
+
+.calculator-result p {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.calculator-result p span {
+    font-weight: bold;
+    color: var(--link-color);
+}

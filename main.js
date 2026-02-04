@@ -6,6 +6,38 @@ const ALPHA_VANTAGE_BASE_URL = 'https://www.alphavantage.co/query';
 
 // --- Helper Functions ---
 
+// Function to format currency
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(amount);
+}
+
+// Function to calculate dividend compound interest
+function calculateDividendCompound() {
+    const initialInvestment = parseFloat(document.getElementById('initialInvestment').value);
+    const annualDividendYield = parseFloat(document.getElementById('annualDividendYield').value) / 100;
+    const annualContribution = parseFloat(document.getElementById('annualContribution').value);
+    const investmentPeriod = parseInt(document.getElementById('investmentPeriod').value);
+
+    let currentAsset = initialInvestment;
+    let totalDividendsReceived = 0;
+    let totalInvestedCapital = initialInvestment;
+
+    for (let year = 1; year <= investmentPeriod; year++) {
+        const dividendsThisYear = currentAsset * annualDividendYield;
+        totalDividendsReceived += dividendsThisYear;
+        currentAsset += dividendsThisYear + annualContribution;
+    }
+    
+    totalInvestedCapital = initialInvestment + (annualContribution * investmentPeriod);
+
+    const roi = ((currentAsset - totalInvestedCapital) / totalInvestedCapital) * 100;
+
+    document.getElementById('finalAsset').textContent = formatCurrency(currentAsset);
+    document.getElementById('totalDividends').textContent = formatCurrency(totalDividendsReceived);
+    document.getElementById('totalInvestment').textContent = formatCurrency(totalInvestedCapital);
+    document.getElementById('roi').textContent = `${roi.toFixed(2)}%`;
+}
+
 
 /**
  * Calculates Simple Moving Average (SMA).
@@ -607,4 +639,40 @@ async function fetchAndRecommendStocks() {
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndRecommendStocks(); // Initial call to fetch and recommend stocks
+
+    // Dividend Calculator Modal Logic
+    const calculatorActionBtn = document.getElementById('calculator-action-btn');
+    const dividendCalculatorModal = document.getElementById('dividend-calculator-modal');
+    const calculatorCloseBtn = document.getElementById('calculator-close-button');
+    const calculateBtn = document.getElementById('calculate-dividend');
+
+    if (calculatorActionBtn) {
+        calculatorActionBtn.addEventListener('click', () => {
+            dividendCalculatorModal.classList.add('show');
+            calculateDividendCompound(); // Perform initial calculation when modal opens
+        });
+    }
+
+    if (calculatorCloseBtn) {
+        calculatorCloseBtn.addEventListener('click', () => {
+            dividendCalculatorModal.classList.remove('show');
+        });
+    }
+
+    if (calculateBtn) {
+        calculateBtn.addEventListener('click', calculateDividendCompound);
+        // Also recalculate on input changes
+        document.getElementById('initialInvestment').addEventListener('input', calculateDividendCompound);
+        document.getElementById('annualDividendYield').addEventListener('input', calculateDividendCompound);
+        document.getElementById('annualContribution').addEventListener('input', calculateDividendCompound);
+        document.getElementById('investmentPeriod').addEventListener('input', calculateDividendCompound);
+    }
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+        if (event.target == dividendCalculatorModal) {
+            dividendCalculatorModal.classList.remove('show');
+        }
+    });
+
 });
